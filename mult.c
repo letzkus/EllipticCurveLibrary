@@ -3,11 +3,32 @@
  *
  */
 
-void bp_lookup(uint32_t )
+/* 
+ * FUNCTION 
+ *   bp_lookup
+ *
+ * INPUT
+ *   a - lookup key, max. 32bit
+ *
+ * OUTPUT
+ *   b - vector representing the result of the multiplication
+ *	 t - length of output
+ *
+ * RETURN 
+ *   -
+ *
+ * DESCRIPTION/REMARKS
+ *   The function calculates a(x)*a(x) mod m within the binary field F_2^m
+ * 	 This implementation makes use of the binary polynomquadration algorithm.
+ *
+ */
+void bp_lookup(uint32_t *a, uint32_t *b, uint32_t *t) {
+	
+}
 
 /* 
  * FUNCTION 
- *   mult_bp
+ *   bp_mult
  *
  * INPUT
  *   m - extension degree of binary field
@@ -25,7 +46,7 @@ void bp_lookup(uint32_t )
  * 	 This implementation makes use of the binary polynomquadration algorithm.
  *
  */
-void mult_bp(uint32_t m, uint32_t t, uint32_t *a, uint32_t *b) {
+void bp_mult(uint32_t m, uint32_t t, uint32_t *a, uint32_t *b) {
 	
 	uint32_t s[2*t];
 	
