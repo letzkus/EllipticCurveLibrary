@@ -16,8 +16,7 @@
  
 #include <stdio.h>
 #include <stdint.h>
-#include "inv.c"
-#include "mult.c"
+#include "add.c"
 
 /*
  * FUNCTION
