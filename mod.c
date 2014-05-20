@@ -47,8 +47,9 @@ void mod(uint32_t t, uint32_t *a, uint32_t *f, uint32_t *b) {
  * 
  */
 void mod_f163(uint32_t *c) {
-	for (int i=10;i>5;i--) {
-		uint32_t t = c[j];
+	uint32_t t;
+	for (int j=10;j>5;j--) {
+		t = c[j];
 		c[j-6] = c[j-6] ^ (t << 29);
 		c[j-5] = c[j-5] ^ (t << 4) ^ (t << 3) ^ (t >> 3) ^ t;
 		c[j-4] = c[j-4] ^ (t >> 28) ^ (t >> 29)
