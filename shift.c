@@ -33,9 +33,7 @@
  *
  */
 void shiftr(uint32_t t, uint32_t *a, uint32_t k, uint32_t *b) {
-	// b = a >> k for a = a[t]...a[0]
-	printf("test");
-	
+	// b = a >> k for a = a[t]...a[0]	
 	uint32_t ws;	// Word internal shift value
 	uint32_t i;	// loopctr
 	while(k > 0){	
@@ -49,9 +47,10 @@ void shiftr(uint32_t t, uint32_t *a, uint32_t k, uint32_t *b) {
 		}	  
 		
 		b[t-1] = a[t-1] >> ws; // Most significant uint32_t field does not have "underflow" 
-		for(i = t - 2; i >= 0; i--){
+		for(i = t - 2; i > 0; i--){
 		      b[i] = (a[i+1] << (32 - ws) || a[i] >> ws);			    
 		}
+		b[0] = (a[1] << (32 - ws) || a[0] >> ws);
 	}
 }
 

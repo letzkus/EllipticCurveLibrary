@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "add.c"
+#include "shift.c"
 
 /*
  * FUNCTION

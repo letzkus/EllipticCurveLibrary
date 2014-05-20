@@ -34,7 +34,8 @@
  * 	 As one can see, thats simple bit-wise XOR.
  */
 void add(uint32_t t, uint32_t *a, uint32_t *b, uint32_t *c) {
-	for(int i=0;i<t;i++) {
+	int i;
+	for(i=0;i<t;i++) {
 		c[i] = a[i] ^ b[i];
 	}
 }
