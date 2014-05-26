@@ -4,29 +4,85 @@
 
 /*
  * FUNCTION
- *  mod
+ *  mod_r/mod_f
  *
  * INPUT
  *   length t of vector
  *	 input vector a
- *   modul vector f
+ *   modul vector remainder r/modul vector f
  *	 
  *
  * OUTPUT
- *   result vector b
+ *   result vector a reduced by reminder r/modul vector f
  * 
  * RETURN
  *   -
  * 
  * DESCRIPTION/REMARKS
- *   b = a mod f
+ *   mod_r calculates mod using remainder r
+ *   mod_f calculates mod using modul f 
  * 
  * EXAMPLE
  * 	 
  *
  */
-void mod(uint32_t t, uint32_t *a, uint32_t *f, uint32_t *b) {
-	// b = a >> k for a = a[t]...a[0]
+void mod_r(uint32_t t, uint32_t m, uint32_t *c, uint32_t *r) {
+	
+	// A. Precomputation
+	int k;
+	uint32_t u[32][t];
+	for(k=0;k<32;k++) {
+		shiftl(t,r,k,u[k]);
+	}
+	
+	// 1-5
+	int i;
+	uint32_t c[2t];
+	for(i=2m-2;i>=0;i--) {
+		if(getBit(t,a,i/32,i)==1) {
+			uint32_t j = (i-m)/32;
+			uint32_t k = (i-m) - j*32;
+			// c{j} = c{j} ^ Uk
+			c += j;
+			add(t-j, c, u[k], c);
+			c -= j; // restore c;
+		}
+	}
+	
+}
+
+void mod_f(uint32_t t, uint32_t m, uint32_t *a, uint32_t *f) {
+	
+	uint32_t r[t];
+	getRemainder(t,m,f,r);
+	
+	mod_r(t,m,a,r,b);
+	
+}
+
+/*
+ * FUNCTION
+ *  getRemainder
+ *
+ * INPUT
+ *	 input vector f
+ *	 
+ * OUTPUT
+ *   output vector r
+ * 
+ * RETURN
+ *   -
+ * 
+ * DESCRIPTION/REMARKS
+ *   Finds r(x) in f(x) = x^m + r(x) represented by vector F[t-1] F[t-2] ... F[1] F[0]
+ * 
+ */
+void getRemainder(uint32_t t, uint32_t m, uint32_t *f, uint32_t *r) {
+	int i = m/32;
+	uint_t x = 0xFFFFFFFF;
+	r[i] = f[i] & (x-2^m);
+	for(;t>=0;t--) 
+		r[t] = f[t];
 }
 
 /*
@@ -48,13 +104,14 @@ void mod(uint32_t t, uint32_t *a, uint32_t *f, uint32_t *b) {
  */
 void mod_f163(uint32_t *c) {
 	uint32_t t;
-	for (int j=10;j>5;j--) {
+	int j;
+	for (j=10;j>5;j--) {
 		t = c[j];
 		c[j-6] = c[j-6] ^ (t << 29);
 		c[j-5] = c[j-5] ^ (t << 4) ^ (t << 3) ^ (t >> 3) ^ t;
 		c[j-4] = c[j-4] ^ (t >> 28) ^ (t >> 29)
 	}
-	t = (c[5] >> 3) << 3; // == c[5] & 0xFFFFFFF8
+	t = c[5] & 0xFFFFFFF8; // = (c[5] >> 3) << 3;
 	c[0] = c[0] ^ (t << 4) ^ (t << 3) ^ (t >> 3);
 	c[1] = c[1] ^ (t >> 28) ^ (t >> 29);
 	c[5] = c[5] & 0x7;

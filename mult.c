@@ -90,7 +90,7 @@ void r2lvec_mult(uint32_t t, uint32_t *a, uint32_t b, uint32_t *c, uint32_t *f) 
 	for(int i=0;i<t;i++) {
 		for(int j=0;j<32;j++) {
 			
-			if((a[i] >> j) & 255 == 1) { // if a_i = 0 then
+			if(getBit(t,a,i,j) == 1) { // if a_i = 0 then
 				add(t,b,c,c)			 // 	c = c ^ a
 			}
 			
