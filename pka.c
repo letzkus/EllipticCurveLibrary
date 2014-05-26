@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "add.c"
+#include "shift.c"
 
 /*
  * FUNCTION
@@ -270,6 +271,7 @@ uint32_t test_ecc_b163()
 int main(void)
 {
   srand(1);
-  printf("\ntest_ecc_b163: %d\n",test_ecc_b163());
+  shiftTEST();
+  //printf("\ntest_ecc_b163: %d\n",test_ecc_b163());
   return 0;
 }

@@ -3,6 +3,10 @@
  *
  */
 
+#include <stdint.h>
+#include "add.c"
+#include "shift.c"
+
 /* 
  * FUNCTION 
  *   bp_lookup
@@ -25,7 +29,7 @@
  *
  */
 int bp_lookup(uint32_t *a, uint32_t s, uint32_t *b, uint32_t *t) {
-	uint32_t lookupTable[16] = {0, 1, 4, 5, 16, 17, 20, 21 64, 65, 68, 69, 80, 81, 84 85};
+	uint32_t lookupTable[16] = {0, 1, 4, 5, 16, 17, 20, 21, 64, 65, 68, 69, 80, 81, 84, 85};
 				
 	// TODO implement me :)
 								
@@ -82,16 +86,18 @@ void r2lvec_mult(uint32_t t, uint32_t *a, uint32_t b, uint32_t *c, uint32_t *f) 
 	
 	// f = x^m + r -> r = everything exept msb
 	uint32_t *r;
-	for(int i=0;i<t;i++) {
-		r[i] = f[i]
+	int i;
+	int j;
+	for(i=0;i<t;i++) {
+		r[i] = f[i];
 	}
 	r[t-1] = r [t-1] && 127;
 	
-	for(int i=0;i<t;i++) {
-		for(int j=0;j<32;j++) {
+	for(i=0;i<t;i++) {
+		for(j=0;j<32;j++) {
 			
-			if(getBit(t,a,i,j) == 1) { // if a_i = 0 then
-				add(t,b,c,c)			 // 	c = c ^ a
+			if(getBit(t,a,i,j) == 1) { // if a_i = 0 then// if a_i = 0 then
+				add(t,a,c,c);			 // 	c = c ^ a
 			}
 			
 			shiftl(t,b,1,b);			// b << 1
@@ -121,7 +127,7 @@ void r2lvec_mult(uint32_t t, uint32_t *a, uint32_t b, uint32_t *c, uint32_t *f) 
  * DESCRIPTION/REMARKS
  *   - 
  */
-void test_mult() {
+int test_mult() {
 	
 	printf("\n************************************************************\n");
 	printf("test: multInv\n");

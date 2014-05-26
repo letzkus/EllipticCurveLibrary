@@ -2,6 +2,8 @@
  * Implementation of modulo operations
  */
 
+#include <stdint.h>
+
 /*
  * FUNCTION
  *  mod_r/mod_f
