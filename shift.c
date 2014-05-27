@@ -10,7 +10,7 @@
  *  shiftr
  *
  * INPUT
- *   length t of vector
+ *   length la of vector
  *	 input vector a
  *   shift k
  *	 
@@ -32,7 +32,7 @@
  *	 result = a >> k mod f = ...?
  *
  */
-void shiftr(uint32_t t, uint32_t *a, uint32_t k, uint32_t *b) {
+void shiftr(uint32_t la, uint32_t *a, uint32_t k, uint32_t *b) {
 	// b = a >> k for a = a[t-1]...a[0]	 
 	uint32_t ws;	// Word internal shift value
 	uint32_t i;	// loopctr
@@ -40,7 +40,7 @@ void shiftr(uint32_t t, uint32_t *a, uint32_t k, uint32_t *b) {
 	uint32_t cpy;	// Contains copy of current byte 
 
 	// Copy a to result array
-	for(i = 0; i < t; i++)
+	for(i = 0; i < la; i++)
 		b[i] = a[i];
 
 	while(k > 0){
@@ -52,9 +52,9 @@ void shiftr(uint32_t t, uint32_t *a, uint32_t k, uint32_t *b) {
 		    k = 0;
 		}
 
-		uflow = (b[t-1] << (32-ws)); // Prepares underflow for successor byte
-		b[t-1] >>= ws;		
-		for(i = t-2; i >=1; i--){
+		uflow = (b[la-1] << (32-ws)); // Prepares underflow for successor byte
+		b[la-1] >>= ws;		
+		for(i = la-2; i >=1; i--){
 			cpy = b[i];
 			b[i] = (uflow | (b[i] >> ws));
 			uflow = (cpy << (32-ws));
@@ -68,9 +68,11 @@ void shiftr(uint32_t t, uint32_t *a, uint32_t k, uint32_t *b) {
  *  shiftl
  *
  * INPUT
- *   length t of vector
+ *   length la of vector
  *	 input vector a
  *   shift k
+ *   length lb of 
+ *	 input vector b
  *	 
  *
  * OUTPUT
@@ -90,18 +92,17 @@ void shiftr(uint32_t t, uint32_t *a, uint32_t k, uint32_t *b) {
  *	 result = a << k 
  *
  */
-void shiftl(uint32_t t, uint32_t *a, uint32_t k, uint32_t *b) {
+void shiftl(uint32_t la, uint32_t *a, uint32_t k, uint32_t lb, uint32_t *b) {
 	// TODO is overflow handling needed?
 	// important for R2L_mult
 	// b = a << k mod f for a = a[t-1]...a[0]	 
 	uint32_t ws;	// Word internal shift value
 	uint32_t i;	// loopctr
 	uint32_t oflow;	// Contains overflow of lower byte
-	uint32_t cpy;	// Contains copy of current byte 
-	//uint32_t* wcpy = (uint32_t *)malloc(sizeof(uint32_t)*(t+2));	// Working copy of array a
+	uint32_t cpy;	// Contains copy of current byte
 
 	// Copy a to result array
-	for(i = 0; i < t; i++)
+	for(i = 0; i < la; i++)
 		b[i] = a[i];
 
 	while(k > 0){
@@ -115,7 +116,7 @@ void shiftl(uint32_t t, uint32_t *a, uint32_t k, uint32_t *b) {
 
 		oflow = (b[0] >> (32-ws)); // Prepares underflow for successor byte
 		b[0] <<= ws;		
-		for(i = 1; i < t; i++){
+		for(i = 1; i < lb; i++){
 			cpy = b[i];
 			b[i] = (oflow | (b[i] << ws));
 			oflow = (cpy >> (32-ws));
@@ -204,28 +205,28 @@ void shiftTEST() {
 	printf("Tests for shiftl: \n");
 	
 	// a >> 0 
-	shiftl(3, a, 0, b);
+	shiftl(3, a, 0, 3, b);
 	printf("a << 0 = 0xFFFFFFFF 00000000 FFFFFFFF \n");
 	printf("Result: ");
 	testprint(3,b);	
 	printf("\n\n");
 
 	// a >> 4 
-	shiftl(3, a, 4, b);
+	shiftl(3, a, 4, 3, b);
 	printf("a << 4 = 0xFFFFFFF0 0000000F FFFFFFF0 \n");
 	printf("Result: ");
 	testprint(3, b);
 	printf("\n\n");
 	
 	// a >> 36
-	shiftl(3, a, 36, b);
+	shiftl(3, a, 36, 3, b);
 	printf("a << 36 = 0x0000000F FFFFFFF0 000000000 \n");
 	printf("Result: ");
 	testprint(3, b);
 	printf("\n\n");
 
 	// a >> 33
-	shiftl(3, a, 33, b);
+	shiftl(3, a, 33, 3, b);
 	printf("a << 33 = 0x00000001 FFFFFFFE 000000000 \n");
 	printf("Result: ");
 	testprint(3, b);

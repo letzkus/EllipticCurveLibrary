@@ -25,7 +25,7 @@
  *
  */
 uint32_t getBit(uint32_t t, uint32_t *a, uint32_t k, uint32_t j) {
-	return (a[j] >> j) & 0x1;
+	return (a[k] >> j) & 0x1;
 }
 
 void and(uint32_t t, uint32_t *a, uint32_t *b, uint32_t *c) {

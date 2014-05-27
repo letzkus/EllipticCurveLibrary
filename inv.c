@@ -50,7 +50,7 @@ void multInv(uint32_t m, uint32_t t, uint32_t *a, uint32_t *b) {
  *   f(z) = z^163 + z^7 + z^6 + z^3 + 1.
  *   We have: 11001001 = 0xC9.
  */
-void test_multInv() {
+uint32_t test_multInv() {
 	
 	uint32_t t = 6;
 	uint32_t m = 7;

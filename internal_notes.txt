@@ -1,3 +1,10 @@
+Mögliche Optimierungen:
+=======================
+- Herausziehen der Modulo Operation während der Multiplikation => Nur noch eine Reduktion anstatt Reduktion nach jeder Addition 
+
+
+
+
 scalar:
 
 
