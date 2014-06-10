@@ -18,7 +18,6 @@
 #include <stdint.h>
 #include "add.c"
 #include "shift.c"
-#include "inv.c"
 
 /*
  * FUNCTION

@@ -82,7 +82,7 @@ void bp_mult(uint32_t m, uint32_t t, uint32_t *a, uint32_t *b) {
  * 	 This implementation makes use of the R2L Shift and Add Algorithm for vectors
  *
  */
-void r2lvec_mult(uint32_t t, uint32_t *a, uint32_t *b, uint32_t *c, uint32_t *f) {
+void r2lvec_mult(uint32_t t, uint32_t *a, uint32_t b, uint32_t *c, uint32_t *f) {
 	
 	// f = x^m + r -> r = everything exept msb
 	uint32_t *r;

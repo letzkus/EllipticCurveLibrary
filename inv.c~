@@ -216,7 +216,7 @@ void test_multInv() {
 
 	// Test 2
 	printf("Test 2: multInv(4,17) = 13\n");
-	multInv(6,d,6,a,c);
+	multInv(6,a,6,d,c);
 
 	if(c[2] == 0 && c[1] == 0 && c[0] == 0xD){
 		printf("Test passed!");

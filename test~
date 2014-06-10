@@ -1,0 +1,8 @@
+#include "add.c"
+
+void main(){
+	uint32_t a[1] = {0x1};
+	uint32_t b[1] = {0x2};
+	
+
+}
