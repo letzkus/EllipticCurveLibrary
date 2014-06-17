@@ -40,7 +40,7 @@ void add(uint32_t t, uint32_t *a, uint32_t *b, uint32_t *c) {
 	}
 }
 
-void addI(uint32_t s_a, uint32_t *a, uint_suint32_t *b, uint32_t *c) {
+void addI(uint32_t s_a, uint32_t *a, uint32_t s_b, uint32_t *b, uint32_t *c) {
 	int i;
 	for(i=0;(i< s_a && i < s_b);i++) {
 		c[i] = a[i] ^ b[i];

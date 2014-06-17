@@ -80,7 +80,6 @@ void mod_f(uint32_t t, uint32_t m, uint32_t *a, uint32_t *f) {
  *   Finds r(x) in f(x) = x^m + r(x) represented by vector F[t-1] F[t-2] ... F[1] F[0]
  * 
  */
-/*
 void getRemainder(uint32_t t, uint32_t m, uint32_t *f, uint32_t *r) {
 	int i = m/32;
 	uint32_t x = 0xFFFFFFFF;
@@ -88,7 +87,7 @@ void getRemainder(uint32_t t, uint32_t m, uint32_t *f, uint32_t *r) {
 	for(;t>=0;t--) 
 		r[t] = f[t];
 }
-*/
+
 /*
  * FUNCTION
  *  mod_f163

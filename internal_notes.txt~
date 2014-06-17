@@ -5,7 +5,12 @@ Mögliche Optimierungen:
 - Multiplcative Inverse: 
 	- Degree-Berechnung nicht mehr ständig neuberechnen sondern anpassen
 
+- deg optimieren
 
+- polynom quadrierung implementieren anstelle von echtem quadrieren
+
+- Multiplikation:
+	- nicht modulo 163 aber einfach mit rest addieren
 
 
 scalar:

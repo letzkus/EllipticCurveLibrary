@@ -7,7 +7,13 @@ Mögliche Optimierungen:
 
 - deg optimieren
 
+- polynom quadrierung implementieren anstelle von echtem quadrieren
 
+- Multiplikation:
+	- nicht modulo 163 aber einfach mit rest addieren
+
+- add & dbl:
+	- temp variablen am anfang initialisieren und späternicht bei jedem call neu erzeugen!
 
 
 scalar:

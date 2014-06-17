@@ -1,0 +1,3 @@
+/*
+	Implements the efficient squaring of polynomials
+*/
