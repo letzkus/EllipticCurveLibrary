@@ -80,6 +80,7 @@ void mod_f(uint32_t t, uint32_t m, uint32_t *a, uint32_t *f) {
  *   Finds r(x) in f(x) = x^m + r(x) represented by vector F[t-1] F[t-2] ... F[1] F[0]
  * 
  */
+/*
 void getRemainder(uint32_t t, uint32_t m, uint32_t *f, uint32_t *r) {
 	int i = m/32;
 	uint32_t x = 0xFFFFFFFF;
@@ -87,7 +88,7 @@ void getRemainder(uint32_t t, uint32_t m, uint32_t *f, uint32_t *r) {
 	for(;t>=0;t--) 
 		r[t] = f[t];
 }
-
+*/
 /*
  * FUNCTION
  *  mod_f163
@@ -105,10 +106,10 @@ void getRemainder(uint32_t t, uint32_t m, uint32_t *f, uint32_t *r) {
  *   Optimized for f(x) = x^163 + x^7 + x^6 + x^3 + 1
  * 
  */
-void mod_f163(uint32_t *c) {
+void mod_f163_test(uint32_t *c) {
 	uint32_t t;
 	int j;
-	for (j=10;j>5;j--) {
+	for (j=10;j>5;j--) { 
 		t = c[j];
 		c[j-6] = c[j-6] ^ (t << 29);
 		c[j-5] = c[j-5] ^ (t << 4) ^ (t << 3) ^ t ^ (t >> 3);
@@ -116,6 +117,21 @@ void mod_f163(uint32_t *c) {
 	}
 	t = c[5] & 0xFFFFFFF8; // = (c[5] >> 3) << 3;
 	c[0] = c[0] ^ (t << 4) ^ (t << 3) ^ t ^(t >> 3);
+	c[1] = c[1] ^ (t >> 28) ^ (t >> 29);
+	c[5] = c[5] & 0x7;
+}
+
+void mod_f163(uint32_t *c) {
+	uint32_t t;
+	int j;
+	for (j=10;j>5;j--) { 
+		t = c[j];
+		c[j-6] = c[j-6] ^ (t << 29);
+		c[j-5] = c[j-5] ^ (t << 4) ^ (t << 3) ^ t ^ (t >> 3);
+		c[j-4] = c[j-4] ^ (t >> 28) ^ (t >> 29);
+	}
+	t = c[5] >> 3; // = (c[5] >> 3) << 3;
+	c[0] = c[0] ^ (t << 7) ^ (t << 6) ^ t ^(t << 3) ^ t;
 	c[1] = c[1] ^ (t >> 28) ^ (t >> 29);
 	c[5] = c[5] & 0x7;
 }

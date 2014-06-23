@@ -94,28 +94,33 @@ void bp_mult(uint32_t m, uint32_t t, uint32_t *a, uint32_t *b) {
 void mult(uint32_t la, uint32_t *a, uint32_t lb, uint32_t *b, uint32_t *c) {
 
 	// Initialize
-	uint32_t *cb = (uint32_t *) calloc(11, sizeof(uint32_t)); // Copy of b 		
-	memcpy (c, cb, (sizeof(uint32_t) * 10)); // make c = 0; TODO MAYBE throw this out
-	memcpy (cb, b, (sizeof(uint32_t) * (lb))); // cb = b
+	uint32_t *ca = (uint32_t *) calloc((la+1), sizeof(uint32_t)); // Needed to ba able to use *a = *c 				
+	memcpy (ca, a, (sizeof(uint32_t) * la)); // Copy of a	
+	uint32_t *cb = (uint32_t *) calloc((lb+1), sizeof(uint32_t)); // Copy of b 		
+	memcpy (cb, b, (sizeof(uint32_t) * (lb))); // cb = b	
+	
+	int k;
+	int j;
+
+	for(j = 0; j < la; j++)
+		c[j]=0x00000000; // make c = 0; TODO MAYBE throw this out
+		
 
 	uint32_t mask = 0xFFFFFFF7;
-	uint32_t r[1] = {0x000000C9};
-
-	int k;
-	int j;	
+	uint32_t r[1] = {0x000000C9};	
 	
 	// Multiply a & b
 	for(j=0;j<la;j++) { // maybe verdreht!!!
 		for(k=0;k<32;k++) {
-			if(getBit(a,j,k) == 1) {// is bit k of a[j] = 1?
+			if(getBit(ca,j,k) == 1) {// is bit k of a[j] = 1?
 				add(10,c,cb,c);	// c = b ^ c TODO optimization to length 5?
 			}
 
-			shiftl(10,cb,1,10,cb);	// b << 1
+			shiftl(lb,cb,1,lb,cb);	// b << 1
 
 			if(cb[5] >> 3){
 				cb[5] = cb[5] & mask;
-				addI(10,cb,1,r,cb);				
+				addI(lb,cb,1,r,cb);				
 				// mod f
 				//mod_f163(cb); // Works but slower
 			}		

@@ -103,8 +103,7 @@ int isOne(uint32_t s, uint32_t *a) {
  */
 void multInv(uint32_t sa, uint32_t *a, uint32_t sf, uint32_t *f, uint32_t *c) {
 	// degree of a is at most m-1 => array size should be that of f
-	// => sf >= sa
-	
+	// => sf >= sa	
 
 	// Initialize 
 	//uint32_t *u = (uint32_t *) malloc(sizeof(uint32_t) * (s_a+1));	
