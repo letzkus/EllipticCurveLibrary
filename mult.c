@@ -106,21 +106,22 @@ void mult(uint32_t la, uint32_t *a, uint32_t lb, uint32_t *b, uint32_t *c) {
 		c[j]=0x00000000; // make c = 0; TODO MAYBE throw this out
 		
 
-	uint32_t mask = 0xFFFFFFF7;
-	uint32_t r[1] = {0x000000C9};	
+	//uint32_t mask = 0xFFFFFFF7;
+	//uint32_t r = 0x000000C9;	
 	
 	// Multiply a & b
 	for(j=0;j<la;j++) { // maybe verdreht!!!
 		for(k=0;k<32;k++) {
 			if(getBit(ca,j,k) == 1) {// is bit k of a[j] = 1?
-				add(10,c,cb,c);	// c = b ^ c TODO optimization to length 5?
+				add(6,c,cb,c);	// c = b ^ c TODO optimization to length 5?
 			}
 
 			shiftl(lb,cb,1,lb,cb);	// b << 1
 
 			if(cb[5] >> 3){
-				cb[5] = cb[5] & mask;
-				addI(lb,cb,1,r,cb);				
+				cb[5] = cb[5] & 0xFFFFFFF7;
+				cb[0] = cb[0] ^ 0x000000C9; // Rest of F				
+				//addI(lb,cb,1,r,cb);				
 				// mod f
 				//mod_f163(cb); // Works but slower
 			}		

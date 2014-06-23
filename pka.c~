@@ -22,8 +22,14 @@
 #include "inv.c"
 #include "mult.c"
 #include "mod.c"
+#include "quad.c"
 
 #define INFINITELEMENT 0xFFFFFFFF
+
+// Temporary variables for later use
+uint32_t temp[6];
+uint32_t temp2[6];
+uint32_t temp3[6];
 
 /*
  * FUNCTION
@@ -186,17 +192,12 @@ void addP(uint32_t l, uint32_t *f, uint32_t *a, uint32_t *xP, uint32_t *yP, uint
 	memcpy (cxP, xP, (sizeof(uint32_t) * (l))); // Copy of xP
 	uint32_t *cyP = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));
 	memcpy (cyP, yP, (sizeof(uint32_t) * (l))); // Copy of yP
-	uint32_t *cxQ = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));
-	memcpy (cxQ, xQ, (sizeof(uint32_t) * (l))); // Copy of xQ
-	uint32_t *cyQ = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));
-	memcpy (cyQ, yQ, (sizeof(uint32_t) * (l))); // Copy of yQ
-
-	uint32_t *temp = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));		
-	uint32_t *temp2 = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));
-	uint32_t *temp3 = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));
-	memcpy (temp3, xP, (sizeof(uint32_t) * (l))); // temp2 = xP (makes sure that (xP,yP) may be (xR,yR) when calling dbl	
 	
-	// Check if P = +-Q => P+Q = infinit element
+	//uint32_t *temp = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));		
+	//uint32_t *temp2 = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));
+	//uint32_t *temp3 = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));
+	
+	// Check if P = +-Q => P+Q = infinit element // TODO testen
 	add(l,xQ,yQ,temp);
 	int i;
 	if(f2m_is_equal(l,xP,xQ) && (f2m_is_equal(l,yP,yQ) || f2m_is_equal(l,yP,temp))){
@@ -211,18 +212,19 @@ void addP(uint32_t l, uint32_t *f, uint32_t *a, uint32_t *xP, uint32_t *yP, uint
 	////////////////
 	
 	// Calculate (yQ+yP)*(xQ+xP)^-1
-	add(l,cyQ,cyP,temp);  // not needed anymore after this => throw it away
-	add(l,cxQ,cxP,temp2); // Contains xP + xQ => keep for later use
-	multInv(l,temp2,l,f,temp2); 	// Contains (xP + xQ)^-1
-	mult(l,temp,l,temp2,temp); 	// Contains result of (yQ+yP)*(xQ+xP)^-1 TODO Binäre quadrierung von Polynomen für speedup
+	add(l,yQ,cyP,temp);  // not needed anymore after this => throw it away
+	add(l,xQ,cxP,temp3); // Contains xP + xQ => keep for later use
+	multInv(l,temp3,l,f,temp2); 	// Contains (xP + xQ)^-1
+	mult(l,temp,l,temp2,temp); 	// Contains result of (yQ+yP)*(xQ+xP)^-1 
 
 	// Calculate (yQ+yP)*(xQ+xP)^-1 + xP + xQ + a
-	add(l,temp,xP,xR); 		// At this point xP MAY BE(!) overwritten if addP was called with (xP,yP) = (xR,yR)
-	add(l,xR,cxQ,xR);
+	//add(l,temp,xP,xR); 		// At this point xP MAY BE(!) overwritten if addP was called with (xP,yP) = (xR,yR)
+	//add(l,xR,cxQ,xR);
+	add(l,temp,temp3,xR);	
 	add(l,xR,a,xR);
 
 	// Caclculate final xR
-	mult(l,temp,l,temp,temp2); 	// temp2 = ((yQ+yP)*(xQ+xP)^-1)^2 
+	square(l, temp, temp2); //mult(l,temp,l,temp,temp2); 	// temp2 = ((yQ+yP)*(xQ+xP)^-1)^2 TODO Binäre quadrierung von Polynomen für speedup
 	add(l,xR,temp2,xR);	
 	
 	// Calculate yR
@@ -231,20 +233,18 @@ void addP(uint32_t l, uint32_t *f, uint32_t *a, uint32_t *xP, uint32_t *yP, uint
 	// !temp still contains (yQ+yP)*(xQ+xP)^-1!
 	
 	// Calculate temp * (xP + xR)
-	add(l,temp3,xR,temp2);
+	add(l,cxP,xR,temp2);
 	mult(l,temp,l,temp2,temp);
 
 	// Calculate yR = temp + xR + yP
 	add(l,temp,xR,temp);
 	add(l,temp,cyP,yR);
 
-	free(temp);
-	free(temp2);
-	free(temp3);
+	//free(temp);
+	//free(temp2);
+	//free(temp3);
 	free(cxP);
 	free(cyP);
-	free(cxQ);
-	free(cyQ);
 }
 
 /*
@@ -280,9 +280,9 @@ void dbl(uint32_t l, uint32_t *f, uint32_t *b, uint32_t *xP, uint32_t *yP, uint3
 	//memcpy (cyP, yP, (sizeof(uint32_t) * (l))); // Copy of yP
 
 
-	uint32_t *temp = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));		
-	uint32_t *temp2 = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));
-
+	//uint32_t *temp = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));		
+	//uint32_t *temp2 = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));
+	
 	// Check if P == -P => R is infinite element TODO UNSER IF CORRECT
 	add(l,xP,yP,temp);
 	int i;
@@ -296,7 +296,7 @@ void dbl(uint32_t l, uint32_t *f, uint32_t *b, uint32_t *xP, uint32_t *yP, uint3
 
 	// Calclulate xR
 	////////////////
-	mult(l,xP,l,xP,temp); // temp = xp^2 
+	square(l, xP, temp); //mult(l,xP,l,xP,temp); // temp = xp^2 // TODO Polynomquadrierung 
 	multInv(l,temp,l,f,xR); // xR = temp^-1 = x^2^-1
 	mult(l,xR,l,b,xR); // xR = b * xP^2^-1
 	add(l,xR,temp,xR); // xR = xR + xP^2
@@ -310,8 +310,8 @@ void dbl(uint32_t l, uint32_t *f, uint32_t *b, uint32_t *xP, uint32_t *yP, uint3
 	mult(l,yR,l,xR,yR); // yR = (xP + yP * xP^-1) * xR
 	add(l,yR,temp,yR); // yR = (xP + yP * xP^-1) * xR + xp^2 + xR
 	
-	free(temp);
-	free(temp2);
+	//free(temp);
+	//free(temp2);
 	free(cxP);
 }
 
@@ -360,11 +360,12 @@ void mult_scalar(
 	}
 	
 	// Make sure Point P is inside eliptic curve
+	/*
 	uint32_t *cxP = (uint32_t *) calloc(11, sizeof(uint32_t));		
 	memcpy (cxP, xP, (sizeof(uint32_t) * (6))); // cxP = xP
 	uint32_t *cyP = (uint32_t *) calloc(11, sizeof(uint32_t));		
 	memcpy (cyP, yP, (sizeof(uint32_t) * (6))); // cyP = yP	
-	
+	*/
 	//mod_f163(cxP);
 	//mod_f163(cyP);
 
@@ -375,8 +376,7 @@ void mult_scalar(
 
 		if((d[i/32]>>(i%32))&0x1){
 			// Add
-			addP(6, F, a, xQ, yQ, cxP, cyP, xQ, yQ); // TODO unklar wie rum P und Q!
-			//addP(6, F, a, cxP, cyP, xQ, yQ, xQ, yQ); // TODO unklar wie rum P und Q!
+			addP(6, F, a, xQ, yQ, xP, yP, xQ, yQ); // TODO unklar wie rum P und Q!
 		} 
 	}
 } 
@@ -464,32 +464,32 @@ uint32_t test_ecc_b163()
 	printf("generate random private key d and corresponding\n");
 	printf("public key Q with Q = d * P\n");
 	f2m_rand(t,m,d);
-	mult_scalar(m,f,a,b,d,xP,yP,xQ,yQ); // t is overwritten in here oO
-	printf("d  = ");f2m_print(t,d); printf("\n");// TODO t
-	printf("xQ = ");f2m_print(t,xQ); printf("\n"); // TODO t
-	printf("yQ = ");f2m_print(t,yQ); printf("\n"); // TODO t
+	mult_scalar(m,f,a,b,d,xP,yP,xQ,yQ);
+	printf("d  = ");f2m_print(t,d); printf("\n");
+	printf("xQ = ");f2m_print(t,xQ); printf("\n");
+	printf("yQ = ");f2m_print(t,yQ); printf("\n");
 		
 	printf("************************************************************\n");
 	printf("generate random scalar d and challenge C\n");
 	printf("with C = k * P\n");
-	f2m_rand(6,m,k); // TODO t
+	f2m_rand(6,m,k); 
 	mult_scalar(m,f,a,b,k,xP,yP,xC,yC);
-	printf("k  = ");f2m_print(t,k); printf("\n"); // TODO t
-	printf("xC = ");f2m_print(t,xC); printf("\n");// TODO t
-	printf("yC = ");f2m_print(t,yC); printf("\n");// TODO t
+	printf("k  = ");f2m_print(t,k); printf("\n");
+	printf("xC = ");f2m_print(t,xC); printf("\n");
+	printf("yC = ");f2m_print(t,yC); printf("\n");
 
 	printf("************************************************************\n");
 	printf("generate response R with R = d * C = d * k * P \n");
 	mult_scalar(m,f,a,b,d,xC,yC,xR,yR);
-	printf("xR = ");f2m_print(t,xR); printf("\n"); // TODO t
-	printf("yR = ");f2m_print(t,yR); printf("\n");// TODO t
+	printf("xR = ");f2m_print(t,xR); printf("\n");
+	printf("yR = ");f2m_print(t,yR); printf("\n");
 
 	printf("************************************************************\n");
 	printf("generate verification point V with V = k * Q = k * d * P\n");
 	mult_scalar(m,f,a,b,k,xQ,yQ,xV,yV);
-	printf("xV = ");f2m_print(t,xV); printf("\n");// TODO t
-	printf("yV = ");f2m_print(t,yV); printf("\n");// TODO t
-	  if (!f2m_is_equal(t,xV,xR) || !f2m_is_equal(t,yV,yR)) return 1;// TODO t
+	printf("xV = ");f2m_print(t,xV); printf("\n");
+	printf("yV = ");f2m_print(t,yV); printf("\n");
+	  if (!f2m_is_equal(t,xV,xR) || !f2m_is_equal(t,yV,yR)) return 1;
   }
   printf("************************************************************\n");
   printf("test scalar multiplications...\n");
