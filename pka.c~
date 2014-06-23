@@ -465,31 +465,31 @@ uint32_t test_ecc_b163()
 	printf("public key Q with Q = d * P\n");
 	f2m_rand(t,m,d);
 	mult_scalar(m,f,a,b,d,xP,yP,xQ,yQ); // t is overwritten in here oO
-	printf("d  = ");f2m_print(6,d); printf("\n");// TODO t
-	printf("xQ = ");f2m_print(6,xQ); printf("\n"); // TODO t
-	printf("yQ = ");f2m_print(6,yQ); printf("\n"); // TODO t
+	printf("d  = ");f2m_print(t,d); printf("\n");// TODO t
+	printf("xQ = ");f2m_print(t,xQ); printf("\n"); // TODO t
+	printf("yQ = ");f2m_print(t,yQ); printf("\n"); // TODO t
 		
 	printf("************************************************************\n");
 	printf("generate random scalar d and challenge C\n");
 	printf("with C = k * P\n");
 	f2m_rand(6,m,k); // TODO t
 	mult_scalar(m,f,a,b,k,xP,yP,xC,yC);
-	printf("k  = ");f2m_print(6,k); printf("\n"); // TODO t
-	printf("xC = ");f2m_print(6,xC); printf("\n");// TODO t
-	printf("yC = ");f2m_print(6,yC); printf("\n");// TODO t
+	printf("k  = ");f2m_print(t,k); printf("\n"); // TODO t
+	printf("xC = ");f2m_print(t,xC); printf("\n");// TODO t
+	printf("yC = ");f2m_print(t,yC); printf("\n");// TODO t
 
 	printf("************************************************************\n");
 	printf("generate response R with R = d * C = d * k * P \n");
 	mult_scalar(m,f,a,b,d,xC,yC,xR,yR);
-	printf("xR = ");f2m_print(6,xR); printf("\n"); // TODO t
-	printf("yR = ");f2m_print(6,yR); printf("\n");// TODO t
+	printf("xR = ");f2m_print(t,xR); printf("\n"); // TODO t
+	printf("yR = ");f2m_print(t,yR); printf("\n");// TODO t
 
 	printf("************************************************************\n");
 	printf("generate verification point V with V = k * Q = k * d * P\n");
 	mult_scalar(m,f,a,b,k,xQ,yQ,xV,yV);
-	printf("xV = ");f2m_print(6,xV); printf("\n");// TODO t
-	printf("yV = ");f2m_print(6,yV); printf("\n");// TODO t
-	  if (!f2m_is_equal(6,xV,xR) || !f2m_is_equal(6,yV,yR)) return 1;// TODO t
+	printf("xV = ");f2m_print(t,xV); printf("\n");// TODO t
+	printf("yV = ");f2m_print(t,yV); printf("\n");// TODO t
+	  if (!f2m_is_equal(t,xV,xR) || !f2m_is_equal(t,yV,yR)) return 1;// TODO t
   }
   printf("************************************************************\n");
   printf("test scalar multiplications...\n");
