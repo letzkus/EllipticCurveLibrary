@@ -116,7 +116,7 @@ void mult(uint32_t la, uint32_t *a, uint32_t lb, uint32_t *b, uint32_t *c) {
 				add(6,c,cb,c);	// c = b ^ c TODO optimization to length 5?
 			}
 
-			shiftl(lb,cb,1,lb,cb);	// b << 1
+			shiftBl(lb,cb);	// b << 1
 
 			if(cb[5] >> 3){
 				cb[5] = cb[5] & 0xFFFFFFF7;

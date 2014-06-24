@@ -29,6 +29,98 @@ uint32_t f2m_is_equal(
   return 1;
 }
 
+/*
+ * FUNCTION
+ *  shiftTEST
+ *
+ * OUTPUT
+ *   -
+ * 
+ * RETURN
+ *   -
+ * 
+ * DESCRIPTION/REMARKS
+ *  Tests both shift functions 
+ * 
+ * EXAMPLE
+ *   -	
+ */
+void shiftTEST() {
+	// TODO
+	uint32_t a[3] =	{0xffffffff, 0x00000000, 0xffffffff};
+	uint32_t b[3];
+	
+	printf("Arithmetic shift tests:\n\n");	
+
+	// Print a
+	printf("a = "); 
+	f2m_print(3, a);
+	printf("\n\n");	
+
+	// shiftr tests
+	printf("Tests for shiftr: \n");
+	
+	// a >> 0 
+	shiftr(3, a, 0, b);
+	printf("a >> 0 = 0xFFFFFFFF 00000000 FFFFFFFF \n");
+	printf("Result: ");
+	f2m_print(3,b);	
+	printf("\n\n");
+
+	// a >> 4 
+	shiftr(3, a, 4, b);
+	printf("a >> 4 = 0x0FFFFFFF F0000000 0FFFFFFF \n");
+	printf("Result: ");
+	f2m_print(3, b);
+	printf("\n\n");
+	
+	// a >> 36
+	shiftr(3, a, 36, b);
+	printf("a >> 36 = 0x00000000 0FFFFFFF F00000000 \n");
+	printf("Result: ");
+	f2m_print(3, b);
+	printf("\n\n");
+
+	// a >> 33
+	shiftr(3, a, 33, b);
+	printf("a >> 33 = 0x00000000 7FFFFFFF 800000000 \n");
+	printf("Result: ");
+	f2m_print(3, b);
+	printf("\n\n");
+
+	// shiftl tests
+	// TODO these tests may be useless...
+	printf("Tests for shiftl: \n");
+	
+	// a >> 0 
+	shiftl(3, a, 0, 3, b);
+	printf("a << 0 = 0xFFFFFFFF 00000000 FFFFFFFF \n");
+	printf("Result: ");
+	f2m_print(3,b);	
+	printf("\n\n");
+
+	// a >> 4 
+	shiftl(3, a, 4, 3, b);
+	printf("a << 4 = 0xFFFFFFF0 0000000F FFFFFFF0 \n");
+	printf("Result: ");
+	f2m_print(3, b);
+	printf("\n\n");
+	
+	// a >> 36
+	shiftl(3, a, 36, 3, b);
+	printf("a << 36 = 0x0000000F FFFFFFF0 000000000 \n");
+	printf("Result: ");
+	f2m_print(3, b);
+	printf("\n\n");
+
+	// a >> 33
+	shiftl(3, a, 33, 3, b);
+	printf("a << 33 = 0x00000001 FFFFFFFE 000000000 \n");
+	printf("Result: ");
+	f2m_print(3, b);
+	printf("\n\n");
+}
+
 void invTest2(){
 // Problematic value
 //0x6040c0:	0xe8343e36	0xd4994637	0x797db89e	0x5b2a42dd
@@ -216,6 +308,56 @@ void testQuad(){
 		printf("Error!\n\n");
 }
 
+void shiftOptimizedTest(){
+	uint32_t a[3] =	{0x00000001, 0x00000000, 0x00000000};
+	uint32_t b[3] = {0x80000000, 0x00000000, 0x00000000};
+	uint32_t c[3] = {0x80000001, 0x80000001, 0x80000001};
+	
+	printf("Arithmetic shift tests:\n\n");	
+
+		
+	// shiftr tests
+	printf("Tests for shiftl: \n");
+	
+	// Test a
+	printf("a << 0 = ");f2m_print(3, a); printf("\n");
+	shiftBl(3,a);
+	printf("a << 1 = ");f2m_print(3, a); printf("\n");
+
+	// Test b
+	printf("b << 0 = ");f2m_print(3, b); printf("\n");
+	shiftBl(3,b);
+	printf("b << 1 = ");f2m_print(3, b); printf("\n");
+
+	// Test c
+	printf("c << 0 = ");f2m_print(3, c); printf("\n");
+	shiftBl(3,c);
+	printf("c << 1 = ");f2m_print(3, c); printf("\n");
+
+	uint32_t d[3] =	{0x00000001, 0x00000000, 0x00000000};
+	uint32_t e[3] = {0x00000000, 0x00000001, 0x00000000};
+	uint32_t f[3] = {0x00000001, 0x00000001, 0x80000001};
+	
+	// shiftr tests
+	printf("Tests for shiftr: \n");
+	
+	// Test a
+	printf("d >> 0 = ");f2m_print(3, d); printf("\n");
+	shiftBr(3,d);
+	printf("d >> 1 = ");f2m_print(3, d); printf("\n");
+
+	// Test b
+	printf("e >> 0 = ");f2m_print(3, e); printf("\n");
+	shiftBr(3,e);
+	printf("e >> 1 = ");f2m_print(3, e); printf("\n");
+
+	// Test c
+	printf("f >> 0 = ");f2m_print(3, f); printf("\n");
+	shiftBr(3,f);
+	printf("f >> 1 = ");f2m_print(3, f); printf("\n");
+
+}
+
 // runs testcases of the different files
 void main(){
 	//invTest();
@@ -223,7 +365,8 @@ void main(){
 	//testNumberOfOnes();
 	//testDeg();
 	//testMultSpecific();
-	testAddP();
-	testDbl();
-	testQuad();
+	//testAddP(); TODO!!!!
+	//testDbl(); TODO!!!!!
+	//testQuad();
+	shiftOptimizedTest();
 }

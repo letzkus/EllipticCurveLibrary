@@ -32,7 +32,7 @@ uint32_t deg(uint32_t s, uint32_t *a) {
 	
 	int i = (s * 32)-1;
 	
-	for(i; i > 0; i--){
+	for(i; i >= 0; i--){
 		if(a[i/32]>>(i%32)&0x1)
 			return i;
 	}	
@@ -132,24 +132,24 @@ void multInv(uint32_t sa, uint32_t *a, uint32_t sf, uint32_t *f, uint32_t *c) {
 	while(!isOne(sf, u) && !isOne(sf,v)){
 		
 		while ((u[0] & 0x1) != 1){	// u divisible by x ?
-			shiftr(sf, u, 1, u);	// u = u / x
+			shiftBr(sf, u);	// u = u / x
 			
 			if((g1[0] & 0x1) != 1) {	// g1 divisible by x?
-				shiftr(sf, g1, 1, g1);	// g1 = g1 / x
+				shiftBr(sf, g1);	// g1 = g1 / x
 			} else {
 				add(sf, g1, f, g1);	// g1 = g1 + f
-				shiftr(sf, g1, 1, g1);		// g1 = g1 / x
+				shiftBr(sf, g1);		// g1 = g1 / x
 			}
 		}
 
 		while ((v[0] & 0x1) != 1){		// v divisible by x
-			shiftr(sf, v, 1, v);	// v = v / x
+			shiftBr(sf, v);	// v = v / x
 			
 			if((g2[0] & 0x1) != 1) {	// g2 divisible by x?
-				shiftr(sf, g2, 1, g2);	// g2 = g2 / x
+				shiftBr(sf, g2);	// g2 = g2 / x
 			} else {
 				add(sf, g2, f, g2);	// g2 = g2 + f
-				shiftr(sf, g2, 1, g2);		// g2 = g2 / x
+				shiftBr(sf, g2);		// g2 = g2 / x
 			}
 		}
 

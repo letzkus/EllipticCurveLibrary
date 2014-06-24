@@ -63,6 +63,21 @@ void shiftr(uint32_t la, uint32_t *a, uint32_t k, uint32_t *b) {
 	}
 }
 
+void shiftBr(uint32_t l, uint32_t *a){
+	int i;
+	uint32_t lsb;
+	uint32_t tmp;
+
+	lsb = (a[l-1] & 0x00000001) << 31;
+	a[l-1] >>= 1;
+
+	for(i = l-2; i >= 0; i--){
+		tmp = (a[i] & 0x00000001) << 31;		
+		a[i] = ((a[i] >> 1) | lsb);
+		lsb = tmp;		
+	}
+}
+
 /*
  * FUNCTION
  *  shiftl
@@ -92,7 +107,7 @@ void shiftr(uint32_t la, uint32_t *a, uint32_t k, uint32_t *b) {
  *	 result = a << k 
  *
  */
-void shiftl(uint32_t la, uint32_t *a, uint32_t k, uint32_t lc, uint32_t *c) {
+void shiftl(uint32_t la, uint32_t *a, uint32_t k, uint32_t lb, uint32_t *b) {
 	// TODO is overflow handling needed?
 	// important for R2L_mult
 	// b = a << k mod f for a = a[t-1]...a[0]	 
@@ -126,109 +141,18 @@ void shiftl(uint32_t la, uint32_t *a, uint32_t k, uint32_t lc, uint32_t *c) {
 	//free wcpy;	// Free allocation of working copy
 }
 
-/*
- *
- * TODO REMOVE IF POSSIBLE
- *
- */
-void testprint(
-  uint32_t t,
-	uint32_t *A
-)
-{ 
-  uint32_t i;
-  printf("0x");
-  for (i = 0; i < t; i++) printf("%.8X ",A[t-i-1]);
-}
 
-/*
- * FUNCTION
- *  shiftTEST
- *
- * OUTPUT
- *   -
- * 
- * RETURN
- *   -
- * 
- * DESCRIPTION/REMARKS
- *  Tests both shift functions 
- * 
- * EXAMPLE
- *   -	
- */
-void shiftTEST() {
-	// TODO
-	uint32_t a[3] =	{0xffffffff, 0x00000000, 0xffffffff};
-	uint32_t b[3];
-	
-	printf("Arithmetic shift tests:\n\n");	
+void shiftBl(uint32_t l, uint32_t *a){
+	int i;
+	uint32_t msb;
+	uint32_t tmp;
 
-	// Print a
-	printf("a = "); 
-	testprint(3, a);
-	printf("\n\n");	
+	msb = (a[0] & 0x80000000) >> 31;
+	a[0] <<= 1;
 
-	// shiftr tests
-	printf("Tests for shiftr: \n");
-	
-	// a >> 0 
-	shiftr(3, a, 0, b);
-	printf("a >> 0 = 0xFFFFFFFF 00000000 FFFFFFFF \n");
-	printf("Result: ");
-	testprint(3,b);	
-	printf("\n\n");
-
-	// a >> 4 
-	shiftr(3, a, 4, b);
-	printf("a >> 4 = 0x0FFFFFFF F0000000 0FFFFFFF \n");
-	printf("Result: ");
-	testprint(3, b);
-	printf("\n\n");
-	
-	// a >> 36
-	shiftr(3, a, 36, b);
-	printf("a >> 36 = 0x00000000 0FFFFFFF F00000000 \n");
-	printf("Result: ");
-	testprint(3, b);
-	printf("\n\n");
-
-	// a >> 33
-	shiftr(3, a, 33, b);
-	printf("a >> 33 = 0x00000000 7FFFFFFF 800000000 \n");
-	printf("Result: ");
-	testprint(3, b);
-	printf("\n\n");
-
-	// shiftl tests
-	// TODO these tests may be useless...
-	printf("Tests for shiftl: \n");
-	
-	// a >> 0 
-	shiftl(3, a, 0, 3, b);
-	printf("a << 0 = 0xFFFFFFFF 00000000 FFFFFFFF \n");
-	printf("Result: ");
-	testprint(3,b);	
-	printf("\n\n");
-
-	// a >> 4 
-	shiftl(3, a, 4, 3, b);
-	printf("a << 4 = 0xFFFFFFF0 0000000F FFFFFFF0 \n");
-	printf("Result: ");
-	testprint(3, b);
-	printf("\n\n");
-	
-	// a >> 36
-	shiftl(3, a, 36, 3, b);
-	printf("a << 36 = 0x0000000F FFFFFFF0 000000000 \n");
-	printf("Result: ");
-	testprint(3, b);
-	printf("\n\n");
-
-	// a >> 33
-	shiftl(3, a, 33, 3, b);
-	printf("a << 33 = 0x00000001 FFFFFFFE 000000000 \n");
-	printf("Result: ");
-	testprint(3, b);
-	printf("\n\n");
+	for(i = 1; i < l; i++){
+		tmp = (a[i] & 0x80000000) >> 31;		
+		a[i] = ((a[i] << 1) | msb);
+		msb = tmp;		
+	}
 }
