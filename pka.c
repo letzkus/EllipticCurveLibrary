@@ -355,6 +355,40 @@ void mult_scalar(
 )
 {
 	// Initialize
+	int i = deg(6,d);	
+	
+	// Q = neutral element
+	for(i = 0; i < 6; i++){
+		xQ[i] = INFINITELEMENT;
+		yQ[i] = INFINITELEMENT;
+	}
+	
+	// Implements the double and add method
+	for(; i >= 0; i--){
+		// Double
+		dbl(6, F, b, xQ, yQ, xQ, yQ);
+
+		if((d[i/32]>>(i%32))&0x1){
+			// Add
+			addP(6, F, a, xQ, yQ, xP, yP, xQ, yQ);
+		} 
+	}
+}
+
+/*
+void mult_scalar(
+  uint32_t m,
+  uint32_t *F,
+  uint32_t *a,
+  uint32_t *b,
+  uint32_t *d,
+  uint32_t *xP,
+  uint32_t *yP,
+  uint32_t *xQ,
+  uint32_t *yQ  
+)
+{
+	// Initialize
 	int i;	
 	
 	// Q = neutral element
@@ -363,16 +397,6 @@ void mult_scalar(
 		yQ[i] = INFINITELEMENT;
 	}
 	
-	// Make sure Point P is inside eliptic curve
-	/*
-	uint32_t *cxP = (uint32_t *) calloc(11, sizeof(uint32_t));		
-	memcpy (cxP, xP, (sizeof(uint32_t) * (6))); // cxP = xP
-	uint32_t *cyP = (uint32_t *) calloc(11, sizeof(uint32_t));		
-	memcpy (cyP, yP, (sizeof(uint32_t) * (6))); // cyP = yP	
-	*/
-	//mod_f163(cxP);
-	//mod_f163(cyP);
-
 	// Implements the double and add method
 	for(i = 0; i < (32*6); i++){
 		// Double
@@ -380,11 +404,11 @@ void mult_scalar(
 
 		if((d[i/32]>>(i%32))&0x1){
 			// Add
-			addP(6, F, a, xQ, yQ, xP, yP, xQ, yQ); // TODO unklar wie rum P und Q!
+			addP(6, F, a, xQ, yQ, xP, yP, xQ, yQ);
 		} 
 	}
 } 
-
+*/
  
 /* 
  * FUNCTION 
