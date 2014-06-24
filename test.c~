@@ -343,17 +343,17 @@ void shiftOptimizedTest(){
 	
 	// Test a
 	printf("d >> 0 = ");f2m_print(3, d); printf("\n");
-	shiftBl(3,d);
+	shiftBr(3,d);
 	printf("d >> 1 = ");f2m_print(3, d); printf("\n");
 
 	// Test b
 	printf("e >> 0 = ");f2m_print(3, e); printf("\n");
-	shiftBl(3,e);
+	shiftBr(3,e);
 	printf("e >> 1 = ");f2m_print(3, e); printf("\n");
 
 	// Test c
 	printf("f >> 0 = ");f2m_print(3, f); printf("\n");
-	shiftBl(3,f);
+	shiftBr(3,f);
 	printf("f >> 1 = ");f2m_print(3, f); printf("\n");
 
 }

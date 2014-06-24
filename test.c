@@ -360,8 +360,8 @@ void shiftOptimizedTest(){
 
 // runs testcases of the different files
 void main(){
-	//invTest();
-	//invTest2();
+	invTest();
+	invTest2();
 	//testNumberOfOnes();
 	//testDeg();
 	//testMultSpecific();

@@ -151,6 +151,10 @@ int isNeutral(uint32_t l, uint32_t *xV, uint32_t *yV){
 	return 1;
 }
 
+
+uint32_t cxP[6];
+//uint32_t cyP[6];
+
 /*
  * FUNCTION
  *   add
@@ -188,10 +192,10 @@ void addP(uint32_t l, uint32_t *f, uint32_t *a, uint32_t *xP, uint32_t *yP, uint
 	}	
 
 	// Create Copies of all variables that are used
-	uint32_t *cxP = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));
+	//uint32_t *cxP = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));
 	memcpy (cxP, xP, (sizeof(uint32_t) * (l))); // Copy of xP
-	uint32_t *cyP = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));
-	memcpy (cyP, yP, (sizeof(uint32_t) * (l))); // Copy of yP
+	//uint32_t *cyP = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));
+	//memcpy (cyP, yP, (sizeof(uint32_t) * (l))); // Copy of yP
 	
 	//uint32_t *temp = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));		
 	//uint32_t *temp2 = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));
@@ -212,7 +216,7 @@ void addP(uint32_t l, uint32_t *f, uint32_t *a, uint32_t *xP, uint32_t *yP, uint
 	////////////////
 	
 	// Calculate (yQ+yP)*(xQ+xP)^-1
-	add(l,yQ,cyP,temp);  // not needed anymore after this => throw it away
+	add(l,yQ,yP,temp);  // not needed anymore after this => throw it away
 	add(l,xQ,cxP,temp3); // Contains xP + xQ => keep for later use
 	multInv(l,temp3,l,f,temp2); 	// Contains (xP + xQ)^-1
 	mult(l,temp,l,temp2,temp); 	// Contains result of (yQ+yP)*(xQ+xP)^-1 
@@ -238,13 +242,13 @@ void addP(uint32_t l, uint32_t *f, uint32_t *a, uint32_t *xP, uint32_t *yP, uint
 
 	// Calculate yR = temp + xR + yP
 	add(l,temp,xR,temp);
-	add(l,temp,cyP,yR);
+	add(l,temp,yP,yR);
 
 	//free(temp);
 	//free(temp2);
 	//free(temp3);
-	free(cxP);
-	free(cyP);
+	//free(cxP);
+	//free(cyP);
 }
 
 /*

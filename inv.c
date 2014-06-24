@@ -10,6 +10,11 @@
 //#include "add.c" // TODO Uncomment for DEBUG
 //#include "shift.c" // TODO Uncomment for DEBUG
 
+uint32_t u[6];
+uint32_t v[6];
+uint32_t g1[6];
+uint32_t g2[6];
+
 /* 
  * FUNCTION 
  *   deg
@@ -26,7 +31,7 @@
  *
  * DESCRIPTION/REMARKS
  *   Caclulates the degree of the given polynomial
- *
+ *	deg(0) = 0 = deg(1)!
  */
 uint32_t deg(uint32_t s, uint32_t *a) {
 	
@@ -39,25 +44,32 @@ uint32_t deg(uint32_t s, uint32_t *a) {
 
 	return 0;
 }
-/*
-uint32_t deg(uint32_t s, uint32_t *a) {
-	uint32_t mask = 0x80000000;
-	uint32_t i = (s * 32) -1;
-	uint32_t *c = (uint32_t *)malloc(sizeof(uint32_t) * (s+1));
-	memcpy(c,a,(sizeof(uint32_t) * (s)));
+
+int greaterDeg(uint32_t s, uint32_t *u, uint32_t *v) {
 	
-	while(i > 0){
-		if((c[s-1] & mask) > 0){
-			free(c);		
-			return i;
-		}
-		i -= 1;
-		shiftl(s, c, 1, s, c);
+	int i = s-1;
+	int j = 31;
+	int ub;
+	int vb;
+
+	while(i >= 0 && u[i] == v[i] && u[i] == 0x0)
+		i--;
+	
+	if(i == -1)
+		return 0;
+
+	for(; j >= 0; j--){
+		ub = ((u[i] >> j)& 0x1);
+		vb = ((v[i] >> j)& 0x1);
+ 	
+		if(ub > vb)
+			return 1;
+		else if (ub < vb || (ub == 1 && vb ==1))
+			return 0;
 	}
 
-	free(c);
 	return 0;
-}*/
+}
 
 /* 
  * FUNCTION 
@@ -78,7 +90,7 @@ uint32_t deg(uint32_t s, uint32_t *a) {
  *   The function calculates a^(-1) within the binary field F_2^m
  *
  */
-int isOne(uint32_t s, uint32_t *a) {
+int isOne_old(uint32_t s, uint32_t *a) {
 	int i = s-1;	
 
 	for(; i > 0; i--)
@@ -90,6 +102,36 @@ int isOne(uint32_t s, uint32_t *a) {
 
 	return 0;
 }
+
+int isOne(uint32_t s, uint32_t *a) {
+	int i;	
+
+	if(a[0] != 0x00000001)
+		return 0;
+	
+	for(i = 1; i < s; i++)
+		if(a[i] != 0)
+			return 0;		
+
+	return 1;
+}
+
+/*
+int neiterIsOne(uint32_t l, uint32_t *u, uint32_t *v){
+	//!isOne(sf, u) && !isOne(sf,v)
+
+	int i;
+
+	
+
+	for(i = 1; i < l; i++){
+		if(u[i]	!= 0x0 || v[i] != 0x0)
+			return 0;
+	}
+
+	if((u[0] != 0x1) && (v[0] != 0x1))
+		return 
+}*/
 
 /* 
  * FUNCTION 
@@ -118,16 +160,23 @@ void multInv(uint32_t sa, uint32_t *a, uint32_t sf, uint32_t *f, uint32_t *c) {
 
 	// Initialize 
 	//uint32_t *u = (uint32_t *) malloc(sizeof(uint32_t) * (s_a+1));	
-	uint32_t *u = (uint32_t *) calloc(sf, sizeof(uint32_t));		
+	//uint32_t *u = (uint32_t *) calloc(sf, sizeof(uint32_t));		
 	memcpy (u, a, (sizeof(uint32_t) * (sa))); // u = a	
 	//uint32_t *v = (uint32_t *) malloc(sizeof(uint32_t) * (s_a+1));
-	uint32_t *v = (uint32_t *) calloc(sf, sizeof(uint32_t));	
+	//uint32_t *v = (uint32_t *) calloc(sf, sizeof(uint32_t));	
 	memcpy (v, f, (sizeof(uint32_t) * (sf))); // v = f	
-	uint32_t *g1 = (uint32_t *) calloc(sf, sizeof(uint32_t));// size ???
-	uint32_t *g2 = (uint32_t *) calloc(sf, sizeof(uint32_t));// size ??
+	//uint32_t *g1 = (uint32_t *) calloc(sf, sizeof(uint32_t));// size ???
+	//uint32_t *g2 = (uint32_t *) calloc(sf, sizeof(uint32_t));// size ??
 	
+
+	int i = sf-1;
+	for(; i > 0; i--){
+		g1[i] = 0x00000000;
+		g2[i] = 0x00000000;
+	}
+
 	g1[0] = 1;
-	//g2[0] = 0;
+	g2[0] = 0;
 
 	while(!isOne(sf, u) && !isOne(sf,v)){
 		
@@ -153,7 +202,7 @@ void multInv(uint32_t sa, uint32_t *a, uint32_t sf, uint32_t *f, uint32_t *c) {
 			}
 		}
 
-		if (deg(sf,u) > deg(sf,v)){
+		if (greaterDeg(sf,u,v)){//(deg(sf,u) > deg(sf,v)){
 			add(sf, u, v, u);		// u = u + v
 			add(sf, g1, g2, g1);		// g1 = g1 + g2
 		} else {
@@ -170,10 +219,10 @@ void multInv(uint32_t sa, uint32_t *a, uint32_t sf, uint32_t *f, uint32_t *c) {
 	}
 
 	// Finalize
-	free(u);
-	free(v);
-	free(g1);
-	free(g2);
+//	free(u);
+//	free(v);
+//	free(g1);
+//	free(g2);
 }
 
 /* 
