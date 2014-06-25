@@ -9,9 +9,6 @@
 #include "mult.c"
 #include "quad.c"
 
-//#include "pka.c"
-
-/*
 void f2m_print(
   uint32_t t,
 	uint32_t *A
@@ -32,7 +29,6 @@ uint32_t f2m_is_equal(
   for (i = 0; i < t; i++) if (A[i] != B[i]) return 0;
   return 1;
 }
-*/
 
 /*
  * FUNCTION
@@ -181,23 +177,33 @@ void invTest(){
 	printf("\n\n");	
 }
 
-void testNumberOfOnes(){
-
-	// Init
-	int i;
+int count(int l, uint32_t *a){
 	int ctr = 0;
-
-	uint32_t d[6] = {0x80000003,0x80000010,0x80000001,0x80000001,0x80000001,0x80000001};
-
+	int i = deg(6,a);
 	// Implements the double and add method
-	for(i = 0; i < (32*6); i++){
-		if((d[i/32]>>(i%32))&0x1){
+	for(; i >= 0; i--){
+		if((a[i/32]>>(i%32))&0x1){
 			// Add
 			ctr++;
 		} 
 	}
+	return ctr;
+}
 
-	printf("Number of 1 = %d \n\n",ctr);
+void testNumberOfOnes(){
+	
+	uint32_t a[6] = {0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000000};
+	printf("a should be: 0\n"); 
+	printf("Result: %d \n\n",count(6,a));	
+	uint32_t b[6] = {0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000001};
+	printf("b should be: 1\n"); 
+	printf("Result: %d \n\n",count(6,b));
+	uint32_t c[6] = {0x10000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000001};
+	printf("c should be: 2\n"); 
+	printf("Result: %d \n\n",count(6,c));	
+	uint32_t d[6] = {0x80000003,0x80000010,0x80000001,0x80000001,0x80000001,0x80000001};
+	printf("Should be: 13\n"); 
+	printf("Result: %d \n\n",count(6,d));
 }
 
 void testMultSpecific(){
@@ -363,139 +369,15 @@ void shiftOptimizedTest(){
 
 }
 
-/*
-Test data taken from following sources:
-
-http://point-at-infinity.org/ecc/nisttv
-http://csrc.nist.gov/groups/ST/toolkit/documents/dss/NISTReCur.pdf
-*/
-/*
-void scalarMultTest(){
-	createTable();
-	uint32_t 
-
-	f[6] = {0x000000C9, 0x00000000, 0x00000000, 
-			0x00000000, 0x00000000, 0x00000008}, // irreducible polynomial 
-	  
-	a[6] = {0x00000001, 0x00000000, 0x00000000, 
-			0x00000000, 0x00000000, 0x00000000}, // ec parameter a 
-		
-  	b[6] = {0x4A3205FD, 0x512F7874, 0x1481EB10,
-        		0xB8C953CA, 0x0A601907, 0x00000002}, // ec parameter b  
-		
-  	xP[6] = {0xE8343E36, 0xD4994637, 0xA0991168,
-        		0x86A2D57E, 0xF0EBA162, 0x00000003}, // x-coord. of base point 
-						 
-  	yP[6] = {0x797324F1, 0xB11C5C0C, 0xA2CDD545,
-        		0x71A0094F, 0xD51FBC6C, 0x00000000}, // y-coord. of base point
-						 
-	xQ[6], // x-coord. of result point
-						 
-  	yQ[6], // y-coord. of result point
-
-	xF[6] = {0xA449F864, 0x2764867D, 0x4C657BB5,
-        		0x3630522F, 0x20589968, 0x00000007}, // x-coord. of result point d = 5
-						 
-  	yF[6] = {0x3550CB9C, 0x007AF301, 0xDB01CA79,
-        		0x5DADA096, 0x02537FF5, 0x00000003}, // y-coord. of result point	
-  	
-	xT[6] = {0xCAA10915, 0x3C9313E7, 0x6914C218,
-        		0x0F581B0D, 0x07E54141, 0x00000005}, // x-coord. of result point
-						 
-  	yT[6] = {0x22748341, 0x97E25F1B, 0xD20961BB,
-        		0x69D3EFDB, 0x03C6D2DE, 0x00000003}, // y-coord. of result point
-	
-	dF[6] = {0x1,0x1,0x1,0x1,0x1,0x0},	
-	
-	dT[6] = {0xA,0x0,0x0,0x0,0x0,0x0};
-
-	  	
-    	printf("************************************************************\n");
-    	printf("Test 1: k = 5\n");	
-    	printf("************************************************************\n");
-	
-	mult_scalar(163,f,a,b,dF,xP,yP,xQ,yQ);
-	printf("xF should be "); f2m_print(7,xF);printf("\n");
-	printf("xF = "); f2m_print(7,xQ);printf("\n");
-	printf("yF should be "); f2m_print(7,yF);printf("\n");
-	printf("yF = "); f2m_print(7,yQ);printf("\n");
-
-	if(f2m_is_equal(6,xQ,xF) && f2m_is_equal(6,yQ,yF))
-		printf("Works!\n\n");
-	else
-		printf("Error!\n\n");
-
-
-    	printf("************************************************************\n");
-    	printf("Test 2: k = 10\n");	
-    	printf("************************************************************\n");
-	
-	mult_scalar(163,f,a,b,dT,xP,yP,xQ,yQ);
-	printf("xT should be "); f2m_print(7,xT);printf("\n");
-	printf("xT = "); f2m_print(7,xQ);printf("\n");
-	printf("yT should be "); f2m_print(7,yT);printf("\n");
-	printf("yT = "); f2m_print(7,yQ);printf("\n");
-	
-	if(f2m_is_equal(6,xQ,xT) && f2m_is_equal(6,yQ,yT))
-		printf("Works!\n\n");
-	else
-		printf("Error!\n\n");
-
-
-//
-k = 1
-x = 03F0EBA16286A2D57EA0991168D4994637E8343E36
-y = 00D51FBC6C71A0094FA2CDD545B11C5C0C797324F1
-
-k = 2
-x = 01AEB33FED9C49E0200A0C561EA66D5AB85BD4C2D4
-y = 0530608192CD47D0C24C20076475FD625CC82895E8
-
-k = 3
-x = 0634000577F86AA315009D6F9B906691F6EDD691FE
-y = 0401A3DE0D6C2EC014E6FBA5653587BD45DC2230BE
-
-k = 4
-x = 04053748C8CCD84AF888D3E7623F4FF3B75D153F39
-y = 064B0908949B6A838153953B06CD169CC311F5FDA7
-
-k = 5
-x = 07205899683630522F4C657BB52764867DA449F864
-y = 0302537FF55DADA096DB01CA79007AF3013550CB9C
-
-k = 6
-x = 065AD02C42180EA317348FFE342FB1CF2A3E896195
-y = 0054D6F924A2880B5507C59B5B768ABDD6883CC94F
-
-k = 7
-x = 043EAAAF4BEA5A8C0A3EB105B31A0CF6ABAD87B13A
-y = 05FAD8CE53A9D7FD436C988C7A932B0BD27289A17F
-
-k = 8
-x = 04547BD66270DF7A9601351A616FEF080D44528B03
-y = 019303302D63359036B047497DC2F1BB94BB3D93C4
-
-k = 9
-x = 04802FB7306AE7CAA87F08815BABDFEEBBA9E7A7D3
-y = 051887A199573D8C5E2E54FA7FB6859C9F5ABA0256
-
-k = 10
-x = 0507E541410F581B0D6914C2183C9313E7CAA10915
-y = 0303C6D2DE69D3EFDBD20961BB97E25F1B22748341
-
-///
-}*/
-
 // runs testcases of the different files
 void main(){
 	//invTest();
 	//invTest2();
-	//testNumberOfOnes();
-	//testDeg();
+	testNumberOfOnes();
+	testDeg();
 	//testMultSpecific();
 	//testAddP(); TODO!!!!
 	//testDbl(); TODO!!!!!
 	//testQuad();
 	//shiftOptimizedTest();
-	//scalarMultTest();
 }

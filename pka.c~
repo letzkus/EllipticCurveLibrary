@@ -375,6 +375,7 @@ void mult_scalar(
 	}
 }
 
+/*
 void mult_scalar(
   uint32_t m,
   uint32_t *F,
@@ -407,7 +408,7 @@ void mult_scalar(
 		} 
 	}
 } 
-
+*/
  
 /* 
  * FUNCTION 
@@ -524,14 +525,201 @@ uint32_t test_ecc_b163()
   return 0;
 }
 
+
+/*
+Test data taken from following sources:
+
+http://point-at-infinity.org/ecc/nisttv
+http://csrc.nist.gov/groups/ST/toolkit/documents/dss/NISTReCur.pdf
+
+The curve used for the tests is B163.
+*/
+void scalarMultTest(){
+	//createTable();
+	uint32_t 
+
+	f[6] = {0x000000C9, 0x00000000, 0x00000000, 
+			0x00000000, 0x00000000, 0x00000008}, // irreducible polynomial 
+	  
+	a[6] = {0x00000001, 0x00000000, 0x00000000, 
+			0x00000000, 0x00000000, 0x00000000}, // ec parameter a 
+		
+  	b[6] = {0x4A3205FD, 0x512F7874, 0x1481EB10,
+        		0xB8C953CA, 0x0A601907, 0x00000002}, // ec parameter b  
+		
+  	xP[6] = {0xE8343E36, 0xD4994637, 0xA0991168,
+        		0x86A2D57E, 0xF0EBA162, 0x00000003}, // x-coord. of base point 
+						 
+  	yP[6] = {0x797324F1, 0xB11C5C0C, 0xA2CDD545,
+        		0x71A0094F, 0xD51FBC6C, 0x00000000}, // y-coord. of base point
+						 
+	xQ[6], // x-coord. of result point
+						 
+  	yQ[6]; // y-coord. of result point
+
+	// Test 0
+	uint32_t dZ[6] = {0x0,0x0,0x0,0x0,0x0,0x0};	
+
+	uint32_t xZ[6] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF}; 
+						 
+  	uint32_t yZ[6] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+  	
+    	printf("************************************************************\n");
+    	printf("Test 0: \nk = 0\n");
+	printf("xZ = "); f2m_print(6,xZ);printf("\n");	
+	printf("yZ = "); f2m_print(6,yZ);printf("\n");    	
+	printf("************************************************************\n");
+
+	mult_scalar(163,f,a,b,dZ,xP,yP,xQ,yQ);
+	
+	printf("xZ = "); f2m_print(6,xQ);printf("\n");
+	printf("yZ = "); f2m_print(6,yQ);printf("\n");
+	
+	if(f2m_is_equal(6,xQ,xZ) && f2m_is_equal(6,yQ,yZ))
+		printf("Passed!\n");
+	else
+		printf("Error!\n");
+
+
+	// Test 1
+	uint32_t dO[6] = {0x1,0x0,0x0,0x0,0x0,0x0};	
+
+	uint32_t xO[6] = {0xE8343E36, 0xD4994637, 0xA0991168,
+        		0x86A2D57E, 0xF0EBA162, 0x00000003}; 
+						 
+  	uint32_t yO[6] = {0x797324F1, 0xB11C5C0C, 0xA2CDD545,
+        		0x71A0094F, 0xD51FBC6C, 0x00000000};
+  	
+    	printf("************************************************************\n");
+    	printf("Test 1: \nk = 1\n");
+	printf("xO = "); f2m_print(6,xO);printf("\n");	
+	printf("yO = "); f2m_print(6,yO);printf("\n");    	
+	printf("************************************************************\n");
+
+	mult_scalar(163,f,a,b,dO,xP,yP,xQ,yQ);
+	
+	printf("xO = "); f2m_print(6,xQ);printf("\n");
+	printf("yO = "); f2m_print(6,yQ);printf("\n");
+	
+	if(f2m_is_equal(6,xQ,xO) && f2m_is_equal(6,yQ,yO))
+		printf("Passed!\n");
+	else
+		printf("Error!\n");
+
+	
+	// Test 2
+	uint32_t dF[6] = {0x5,0x0,0x0,0x0,0x0,0x0};	
+
+	uint32_t xF[6] = {0xA449F864, 0x2764867D, 0x4C657BB5,
+        		0x3630522F, 0x20589968, 0x00000007}; 
+						 
+  	uint32_t yF[6] = {0x3550CB9C, 0x007AF301, 0xDB01CA79,
+        		0x5DADA096, 0x02537FF5, 0x00000003};
+  	
+    	printf("************************************************************\n");
+    	printf("Test 2: \nk = 5\n");
+	printf("xF = "); f2m_print(6,xF);printf("\n");	
+	printf("yF = "); f2m_print(6,yQ);printf("\n");    	
+	printf("************************************************************\n");
+
+	mult_scalar(163,f,a,b,dF,xP,yP,xQ,yQ);
+	
+	printf("xF = "); f2m_print(6,xQ);printf("\n");
+	printf("yF = "); f2m_print(6,yQ);printf("\n");
+	
+	if(f2m_is_equal(6,xQ,xF) && f2m_is_equal(6,yQ,yF))
+		printf("Passed!\n");
+	else
+		printf("Error!\n");
+
+	
+	// Test 3
+	uint32_t dT[6] = {0xA,0x0,0x0,0x0,0x0,0x0};
+
+	uint32_t xT[6] = {0xCAA10915, 0x3C9313E7, 0x6914C218,
+        		0x0F581B0D, 0x07E54141, 0x00000005}; 
+						 
+  	uint32_t yT[6] = {0x22748341, 0x97E25F1B, 0xD20961BB,
+        		0x69D3EFDB, 0x03C6D2DE, 0x00000003};
+	
+    	printf("************************************************************\n");
+    	printf("Test 3: \nk = 10\n");	
+	printf("xT = "); f2m_print(6,xT);printf("\n");
+	printf("yT = "); f2m_print(6,yT);printf("\n");    	
+	printf("************************************************************\n");
+	
+	mult_scalar(163,f,a,b,dT,xP,yP,xQ,yQ);
+	
+	printf("xT = "); f2m_print(6,xQ);printf("\n");
+	printf("yT = "); f2m_print(6,yQ);printf("\n");
+	
+	if(f2m_is_equal(6,xQ,xT) && f2m_is_equal(6,yQ,yT))
+		printf("Passed!\n");
+	else
+		printf("Error!\n");
+
+	// Test 4
+	uint32_t dB[6] = {0x5EED0E10,0x018EBBB9,0x0,0x0,0x0,0x0};
+
+	uint32_t xB[6] = {0x6082CBFE, 0x2E96679C, 0x7BA6AE8A,
+        		0x2F1E4614, 0xB78128BD, 0x00000004}; 
+
+  	uint32_t yB[6] = {0x44824065, 0x9B242ECA, 0x2F911313,
+        		0x212EE4A8, 0x69576EAA, 0x00000003};
+	
+    	printf("************************************************************\n");
+    	printf("Test 4: \nk = 112233445566778899\n");	
+	printf("xB = "); f2m_print(6,xB);printf("\n");
+	printf("yB = "); f2m_print(6,yB);printf("\n");    	
+	printf("************************************************************\n");
+	
+	mult_scalar(163,f,a,b,dB,xP,yP,xQ,yQ);
+	
+	printf("xB = "); f2m_print(6,xQ);printf("\n");
+	printf("yB = "); f2m_print(6,yQ);printf("\n");
+	
+	if(f2m_is_equal(6,xQ,xB) && f2m_is_equal(6,yQ,yB))
+		printf("Passed!\n");
+	else
+		printf("Error!\n");
+
+	// Test 5
+	uint32_t dVB[6] = {0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0x00000003};
+
+	uint32_t xVB[6] = {0xE8343E36, 0xD4994637, 0xA0991168,
+        		0x86A2D57E, 0xF0EBA162, 0x00000003}; 
+
+  	uint32_t yVB[6] = {0x91471AC7, 0x65851A3B, 0x0254C42D,
+        		0xF702DC31, 0x25F41D0E, 0x00000003};
+	
+    	printf("************************************************************\n");
+    	printf("Test 5: \nk = 5846006549323611672814742442876390689256843201586\n");	
+	printf("xVB = "); f2m_print(6,xVB);printf("\n");
+	printf("yVB = "); f2m_print(6,yVB);printf("\n");    	
+	printf("************************************************************\n");
+	
+	mult_scalar(163,f,a,b,dVB,xP,yP,xQ,yQ);
+	
+	printf("xVB = "); f2m_print(6,xQ);printf("\n");
+	printf("yVB = "); f2m_print(6,yQ);printf("\n");
+	
+	if(f2m_is_equal(6,xQ,xVB) && f2m_is_equal(6,yQ,yVB))
+		printf("Passed!\n");
+	else
+		printf("Error!\n");
+}
+
 /* 
  * FUNCTION
  *   main 
  */
 int main(void)
 {
-  createTable();
-  srand(1);
-  printf("\ntest_ecc_b163: %d\n",test_ecc_b163());
-  return 0;
+  	createTable();
+  	scalarMultTest();
+	//srand(1);
+  	//printf("\ntest_ecc_b163: %d\n",test_ecc_b163());
+  	return 0;
 }
