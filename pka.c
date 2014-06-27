@@ -8,15 +8,12 @@
  *   over binary fields.
  *
  * TEAM
- * Name, First Name, Matr.-Nr
- * Name, First Name, Matr.-Nr
  * Letzkus, Fabian, 1480247 (TU Darmstadt)
- *
+ * Springer, Markus, 1401899 (TU Darmstadt)
  */
  
 #include <stdio.h>
 #include <stdint.h>
-#include "binops.c"
 #include "add.c"
 #include "shift.c"
 #include "inv.c"
@@ -297,6 +294,7 @@ void dbl(uint32_t l, uint32_t *f, uint32_t *b, uint32_t *xP, uint32_t *yP, uint3
 			xR[i] = INFINITELEMENT;
 			yR[i] = INFINITELEMENT;
 		}
+		return;
 	}
 
 	// Calclulate xR
@@ -744,14 +742,14 @@ void scalarMultTest(){
 	
     	printf("************************************************************\n");
     	printf("Test 6: \nk = 5846006549323611672814742442876390689256843201587\n");	
-	printf("xVB = "); f2m_print(6,xR);printf("\n");
-	printf("yVB = "); f2m_print(6,yR);printf("\n");    	
+	printf("xR = "); f2m_print(6,xR);printf("\n");
+	printf("yR = "); f2m_print(6,yR);printf("\n");    	
 	printf("************************************************************\n");
 	
 	mult_scalar(163,f,a,b,dR,xP,yP,xQ,yQ);
 	
-	printf("xVB = "); f2m_print(6,xQ);printf("\n");
-	printf("yVB = "); f2m_print(6,yQ);printf("\n");
+	printf("xR = "); f2m_print(6,xQ);printf("\n");
+	printf("yR = "); f2m_print(6,yQ);printf("\n");
 	
 	if(f2m_is_equal(6,xQ,xR) && f2m_is_equal(6,yQ,yR))
 		printf("Passed!\n\n");
