@@ -210,6 +210,7 @@ void addP(uint32_t l, uint32_t *f, uint32_t *a, uint32_t *xP, uint32_t *yP, uint
 			xR[i] = INFINITELEMENT;
 			yR[i] = INFINITELEMENT;
 		}
+		return;
 	}
 
 	// Calculate xR
@@ -319,6 +320,16 @@ void dbl(uint32_t l, uint32_t *f, uint32_t *b, uint32_t *xP, uint32_t *yP, uint3
 	free(cxP);
 }
 
+// TODO Point doubleing on projective coordinates for Montgomery
+void pdbl(uint32_t *b, uint32_t *XP, uint32_t *ZP, uint32_t *XS, uint32_t *ZS){
+
+}
+
+// TODO Point adding on projective coordinates for Montgomery
+void padd(uint32_t *xD, uint32_t *XP, uint32_t *ZP, uint32_t *XQ, uint32_t *ZQ, uint32_t *XR, uint32_t *ZR){
+
+}
+
 /*
  * FUNCTION
  *   mult_scalar
@@ -342,41 +353,7 @@ void dbl(uint32_t l, uint32_t *f, uint32_t *b, uint32_t *xP, uint32_t *yP, uint3
  * DESCRIPTION/REMARKS
  *   The function calculates the point Q = dP
  */
-void mult_scalar(
-  uint32_t m,
-  uint32_t *F,
-  uint32_t *a,
-  uint32_t *b,
-  uint32_t *d,
-  uint32_t *xP,
-  uint32_t *yP,
-  uint32_t *xQ,
-  uint32_t *yQ  
-)
-{
-	// Initialize
-	int i = deg(6,d);	
-	
-	// Q = neutral element
-	for(i = 0; i < 6; i++){
-		xQ[i] = INFINITELEMENT;
-		yQ[i] = INFINITELEMENT;
-	}
-	
-	// Implements the double and add method
-	for(; i >= 0; i--){
-		// Double
-		dbl(6, F, b, xQ, yQ, xQ, yQ);
-
-		if((d[i/32]>>(i%32))&0x1){
-			// Add
-			addP(6, F, a, xQ, yQ, xP, yP, xQ, yQ);
-		} 
-	}
-}
-
-/*
-void mult_scalar(
+/*void mult_scalar(
   uint32_t m,
   uint32_t *F,
   uint32_t *a,
@@ -391,6 +368,7 @@ void mult_scalar(
 	// Initialize
 	int i;	
 	
+
 	// Q = neutral element
 	for(i = 0; i < 6; i++){
 		xQ[i] = INFINITELEMENT;
@@ -398,18 +376,55 @@ void mult_scalar(
 	}
 	
 	// Implements the double and add method
-	for(i = 0; i < (32*6); i++){
+	for(i = deg(6,d); i >= 0; i--){
 		// Double
 		dbl(6, F, b, xQ, yQ, xQ, yQ);
+		//dbls++; // TODO DEBUG REMOVE
+		if((d[i/32]>>(i%32))&0x1){ // (d[i/32] &(0x1 << (i%32)))
+			// Add
+			addP(6, F, a, xQ, yQ, xP, yP, xQ, yQ);
+			//adds++; // TODO DEBUG REMOVE
+		} 
+	}
 
-		if((d[i/32]>>(i%32))&0x1){
+	//printf("Dbl Operations: %d \t Add Operations: %d \n", dbls, adds); // TODO REMOVE DEBUG 
+}*/
+ 
+
+void mult_scalar(
+  uint32_t m,
+  uint32_t *F,
+  uint32_t *a,
+  uint32_t *b,
+  uint32_t *d,
+  uint32_t *xP,
+  uint32_t *yP,
+  uint32_t *xQ,
+  uint32_t *yQ  
+)
+{
+	// Initialize
+	int i;
+ 
+	// Q = neutral element
+	for(i = 0; i < 6; i++){
+		xQ[i] = INFINITELEMENT;
+		yQ[i] = INFINITELEMENT;
+	}
+
+	// Implements the double and add method
+	for(i = deg(6,d); i >= 0; i--){
+		// Double
+		dbl(6, F, b, xQ, yQ, xQ, yQ);
+		if((d[i/32]>>(i%32))&0x1){ // (d[i/32] &(0x1 << (i%32)))
 			// Add
 			addP(6, F, a, xQ, yQ, xP, yP, xQ, yQ);
 		} 
 	}
-} 
-*/
- 
+
+	//printf("Dbl Operations: %d \t Add Operations: %d \n", dbls, adds); // TODO REMOVE DEBUG 
+}
+
 /* 
  * FUNCTION 
  *   test_ecc_b163
@@ -521,7 +536,11 @@ uint32_t test_ecc_b163()
   }
   printf("************************************************************\n");
   printf("test scalar multiplications...\n");
-  for (i = 0; i < 10000; i++) mult_scalar(m,f,a,b,n,xP,yP,xQ,yQ);
+  for (i = 0; i < 10000; i++){ 
+  	mult_scalar(m,f,a,b,n,xP,yP,xQ,yQ);
+  	//printf("Iteration %d finished \n",i);
+  }
+
   return 0;
 }
 
@@ -578,9 +597,9 @@ void scalarMultTest(){
 	printf("yZ = "); f2m_print(6,yQ);printf("\n");
 	
 	if(f2m_is_equal(6,xQ,xZ) && f2m_is_equal(6,yQ,yZ))
-		printf("Passed!\n");
+		printf("Passed!\n\n");
 	else
-		printf("Error!\n");
+		printf("Error!\n\n");
 
 
 	// Test 1
@@ -604,9 +623,9 @@ void scalarMultTest(){
 	printf("yO = "); f2m_print(6,yQ);printf("\n");
 	
 	if(f2m_is_equal(6,xQ,xO) && f2m_is_equal(6,yQ,yO))
-		printf("Passed!\n");
+		printf("Passed!\n\n");
 	else
-		printf("Error!\n");
+		printf("Error!\n\n");
 
 	
 	// Test 2
@@ -630,9 +649,9 @@ void scalarMultTest(){
 	printf("yF = "); f2m_print(6,yQ);printf("\n");
 	
 	if(f2m_is_equal(6,xQ,xF) && f2m_is_equal(6,yQ,yF))
-		printf("Passed!\n");
+		printf("Passed!\n\n");
 	else
-		printf("Error!\n");
+		printf("Error!\n\n");
 
 	
 	// Test 3
@@ -656,12 +675,14 @@ void scalarMultTest(){
 	printf("yT = "); f2m_print(6,yQ);printf("\n");
 	
 	if(f2m_is_equal(6,xQ,xT) && f2m_is_equal(6,yQ,yT))
-		printf("Passed!\n");
+		printf("Passed!\n\n");
 	else
-		printf("Error!\n");
+		printf("Error!\n\n");
 
 	// Test 4
-	uint32_t dB[6] = {0x5EED0E10,0x018EBBB9,0x0,0x0,0x0,0x0};
+	uint32_t dB[6] = {0x5EED0E13,0x018EBBB9,0x0,0x0,0x0,0x0};
+	//uint32_t dB[6] = {0x66778899,0x22334455,0x11,0x0,0x0,0x0};
+
 
 	uint32_t xB[6] = {0x6082CBFE, 0x2E96679C, 0x7BA6AE8A,
         		0x2F1E4614, 0xB78128BD, 0x00000004}; 
@@ -681,12 +702,13 @@ void scalarMultTest(){
 	printf("yB = "); f2m_print(6,yQ);printf("\n");
 	
 	if(f2m_is_equal(6,xQ,xB) && f2m_is_equal(6,yQ,yB))
-		printf("Passed!\n");
+		printf("Passed!\n\n");
 	else
-		printf("Error!\n");
+		printf("Error!\n\n");
 
 	// Test 5
-	uint32_t dVB[6] = {0x00000000,0x00000000,0x00000000,0x00000000,0x00000000,0x00000004};
+	uint32_t dVB[6] = {0xa4234c32,0x77e70c12,0x000292fe,
+				0x00000000,0x00000000,0x00000004};
 
 	uint32_t xVB[6] = {0xE8343E36, 0xD4994637, 0xA0991168,
         		0x86A2D57E, 0xF0EBA162, 0x00000003}; 
@@ -706,9 +728,36 @@ void scalarMultTest(){
 	printf("yVB = "); f2m_print(6,yQ);printf("\n");
 	
 	if(f2m_is_equal(6,xQ,xVB) && f2m_is_equal(6,yQ,yVB))
-		printf("Passed!\n");
+		printf("Passed!\n\n");
 	else
-		printf("Error!\n");
+		printf("Error!\n\n");
+	
+	// Test 6
+	uint32_t dR[6] = {0xa4234c33,0x77e70c12,0x000292fe,
+				0x00000000,0x00000000,0x00000004};
+
+	uint32_t xR[6] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF}; 
+
+  	uint32_t yR[6] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+        		0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+	
+    	printf("************************************************************\n");
+    	printf("Test 6: \nk = 5846006549323611672814742442876390689256843201587\n");	
+	printf("xVB = "); f2m_print(6,xR);printf("\n");
+	printf("yVB = "); f2m_print(6,yR);printf("\n");    	
+	printf("************************************************************\n");
+	
+	mult_scalar(163,f,a,b,dR,xP,yP,xQ,yQ);
+	
+	printf("xVB = "); f2m_print(6,xQ);printf("\n");
+	printf("yVB = "); f2m_print(6,yQ);printf("\n");
+	
+	if(f2m_is_equal(6,xQ,xR) && f2m_is_equal(6,yQ,yR))
+		printf("Passed!\n\n");
+	else
+		printf("Error!\n\n");
+
 }
 
 /* 
@@ -718,8 +767,8 @@ void scalarMultTest(){
 int main(void)
 {
   	createTable();
-  	scalarMultTest();
-	//srand(1);
-  	//printf("\ntest_ecc_b163: %d\n",test_ecc_b163());
+	//scalarMultTest();
+	srand(1);
+  	printf("\ntest_ecc_b163: %d\n",test_ecc_b163());
   	return 0;
 }

@@ -182,7 +182,7 @@ int count(int l, uint32_t *a){
 	int i = deg(6,a);
 	// Implements the double and add method
 	for(; i >= 0; i--){
-		if((d[i/32]>>(i%32))&0x1){
+		if((a[i/32]>>(i%32))&0x1){
 			// Add
 			ctr++;
 		} 
