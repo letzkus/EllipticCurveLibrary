@@ -3,9 +3,6 @@
 */
 #include <math.h>
 
-//#define PARTITIONS 2
-#define TABLESIZE (1 << 16)
-
 uint32_t table[(1 << 16)]; // Table that contains the precomputed partitions
 uint32_t qTemp[12];
 

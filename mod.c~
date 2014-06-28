@@ -1,5 +1,9 @@
 /*
  * Implementation of modulo operations
+ *
+ * TEAM
+ * Letzkus, Fabian, 1480247 (TU Darmstadt)
+ * Springer, Markus, 1401899 (TU Darmstadt) 
  */
 
 #include <stdint.h>
@@ -106,7 +110,7 @@ void getRemainder(uint32_t t, uint32_t m, uint32_t *f, uint32_t *r) {
  *   Optimized for f(x) = x^163 + x^7 + x^6 + x^3 + 1
  * 
  */
-void mod_f163(uint32_t *c) {
+void mod_f163_test(uint32_t *c) {
 	uint32_t t;
 	int j;
 	for (j=10;j>5;j--) { 
@@ -121,7 +125,7 @@ void mod_f163(uint32_t *c) {
 	c[5] = c[5] & 0x7;
 }
 
-void mod_f163_test(uint32_t *c) {
+void mod_f163(uint32_t *c) {
 	uint32_t t;
 	int j;
 	for (j=10;j>5;j--) { 

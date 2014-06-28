@@ -21,8 +21,6 @@
 #include "mod.c"
 #include "quad.c"
 
-#define INFINITELEMENT 0xFFFFFFFF
-
 // Temporary variables for later use
 uint32_t temp[6];
 uint32_t temp2[6];
@@ -119,213 +117,150 @@ uint32_t f2m_is_equal(
 
 /*
  * FUNCTION
- *   isNeutral
+ *   pdbl
  *
  * INPUT
- *   + length of vector v 
- *   + x-coordinate xP of point P
- *   + y-coordinate yP of point P
+ *   + elliptic curve parameter b
+ *   + projective x-coordinate XP of point P
+ *   + projective Z-Value ZP of point P
  *
  * OUTPUT
- *   -
+ *   + projective x-coordinate XS of point S
+ *   + projective Z-Value ZS of point S
  *
  * RETURN
- *   1 if the given vector is the neutral Element
- *   0 if the given vector is not the neutral Element
+ *   -
  *
  * DESCRIPTION/REMARKS
- *   The function calculates point R = Q + P
+ *   Implements the doubling of point P for projective coordinates
  */
-int isNeutral(uint32_t l, uint32_t *xV, uint32_t *yV){
-	int i;
-	//uint32_t mask = 0xFFFFFFFF;
+void pdbl(uint32_t *b, uint32_t *XP, uint32_t *ZP, uint32_t *XS, uint32_t *ZS){
+	square(6,XP,temp); 	// temp = XP^2
+	square(6,temp,temp2); 	// temp2 = XP^4
+	square(6,ZP,temp3);	// temp3 = ZP^2
 
-	for(i = 0; i < l; i++){
-		if(xV[i]!=INFINITELEMENT || yV[i]!=INFINITELEMENT)
-			return 0;
-	}
+	// ZS
+	mult(6,temp,6,temp3,ZS); 	// ZS = XP^2 + ZP^2
 
-	return 1;
+	// XS
+	square(6,temp3,temp3);	// temp3 = ZP^4
+	mult(6,temp3,6,b,temp3);// temp3 = ZP^4 * b
+	add(6,temp2,temp3,XS); 	// XS = XP^4 + ZP^4
 }
-
-
-uint32_t cxP[6];
-//uint32_t cyP[6];
 
 /*
  * FUNCTION
- *   add
+ *   padd
  *
  * INPUT
- *   + length of vectors 
- *   + irreducible polynom F to generate the finite field
- *   + elliptic curve parameter a
  *   + x-coordinate xP of point P
- *   + y-coordinate yP of point P
- *   + x-coordinate xP of point Q
- *   + y-coordinate yP of point Q
+ *   + projective x-coordinate XP of point P
+ *   + projective Z-Value ZP of point P
+ *   + projective x-coordinate XQ of point Q
+ *   + projective Z-Value ZQ of point Q
  *
  * OUTPUT
- *   + x-coordinate xR of point R
- *   + y-coordinate yR of point R
+ *   + projective x-coordinate XR of point R
+ *   + projective Z-Value ZR of point R
  *
  * RETURN
  *   -
  *
  * DESCRIPTION/REMARKS
- *   The function calculates point R = Q + P
+ *   Implements the addition of points P and Q for projective coordinates
  */
-void addP(uint32_t l, uint32_t *f, uint32_t *a, uint32_t *xP, uint32_t *yP, uint32_t *xQ, uint32_t *yQ, uint32_t *xR, uint32_t *yR){
+void padd(uint32_t *xD, uint32_t *XP, uint32_t *ZP, uint32_t *XQ, uint32_t *ZQ, uint32_t *XR, uint32_t *ZR){
+	mult(6,XQ,6,ZP,temp); 	// temp = XQ * ZP
+	mult(6,XP,6,ZQ,temp2);	// temp2 = XP * ZQ
+	mult(6,temp,6,temp2,temp3);	// temp3 = XP * ZQ * XQ * ZP
+	
+	// ZR
+	add(6,temp,temp2,ZR);
+	square(6,ZR,ZR);	// ZR = (XQ * ZP + XP * ZQ)^2
 
-	// Handle Neutral Element case
-	if(isNeutral(l,xP,yP)){
-		memcpy (xR, xQ, (sizeof(uint32_t) * (l)));
-		memcpy (yR, yQ, (sizeof(uint32_t) * (l)));
-		return;
-	} else if (isNeutral(l,xQ,yQ)) {
-		memcpy (xR, xP, (sizeof(uint32_t) * (l)));
-		memcpy (yR, yP, (sizeof(uint32_t) * (l)));
-		return;
+	// XR
+	mult(6,ZR,6,xD,XR); 	// XR = xD * (XQ * ZP + XP * ZQ)^2
+	add(6,XR,temp3,XR);	// XR = xD * (XQ * ZP + XP * ZQ)^2 + (XP * ZQ * XQ * ZP) 
+}
+
+/*
+ * FUNCTION
+ *   Convert
+ *
+ * INPUT
+ *   + x-coordinate xP of point P
+ *   + y-coordinate yP of point P
+ *   + irreducible polynom F to generate the finite field
+ *   + projective x-coordinate X_Q of point Q
+ *   + projective Z-Value Z_Q of point Q
+ *   + projective x-coordinate X_R of point R
+ *   + projective Z-Value Z_R of point R
+ *
+ * OUTPUT
+ *   + x-coordinate xQ of point Q
+ *   + y-coordinate yQ of point Q
+ *
+ * RETURN
+ *   -
+ *
+ * DESCRIPTION/REMARKS
+ *   Converts the projective coordinates of point Q = kP
+ */
+void convert(uint32_t *xP, uint32_t *yP, uint32_t *F, uint32_t *X_Q, uint32_t *Z_Q, uint32_t *X_R, uint32_t *Z_R, uint32_t *xQ, uint32_t *yQ){  
+	// Check if R is infinite element and convert accordingly...
+	int i;	
+	int zq = 1;
+	int zr = 1;
+	for(i = 0; i < 6; i++){
+		if(Z_R[i] != 0x00000000){
+			zr = 0;
+		}
+		if(Z_Q[i] != 0x00000000){
+			zq = 0;
+		}
 	}	
 
-	// Create Copies of all variables that are used
-	//uint32_t *cxP = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));
-	memcpy (cxP, xP, (sizeof(uint32_t) * (l))); // Copy of xP
-	//uint32_t *cyP = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));
-	//memcpy (cyP, yP, (sizeof(uint32_t) * (l))); // Copy of yP
-	
-	//uint32_t *temp = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));		
-	//uint32_t *temp2 = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));
-	//uint32_t *temp3 = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));
-	
-	// Check if P = +-Q => P+Q = infinit element // TODO testen
-	add(l,xQ,yQ,temp);
-	int i;
-	if(f2m_is_equal(l,xP,xQ) && (f2m_is_equal(l,yP,yQ) || f2m_is_equal(l,yP,temp))){
-		// Return neutral element
-		for(i = 0; i < l; i++){
-			xR[i] = INFINITELEMENT;
-			yR[i] = INFINITELEMENT;
-		}
+	// Reminder: Q = kP, R = (k+1)P
+	// xQ 
+	if(zq){	
+		//Q is infinite element
+		for(i = 0; i < 6; i++){
+			xQ[i] = 0xFFFFFFFF;
+			yQ[i] = 0xFFFFFFFF;
+		}	
+
 		return;
+	} else {
+		// xQ is not the finite element
+		multInv(6,Z_Q,6,F,xQ);  
+		mult(6,xQ,6,X_Q,xQ); 
 	}
 
-	// Calculate xR
-	////////////////
+	// yQ
+	// Check if R is the infinite element
+	// If that is the case then 	
+	if(zr){
+		// This means that Q is -P
+		add(6,xP,yP,yQ);
+	} else {
+		add(6,xP,xQ,temp); // temp = (xkp + xp)
+
+		multInv(6,Z_R,6,F,temp2);	// temp2 = Zk+1p^-1 
+		mult(6,temp2,6,X_R,temp2); 	// temp2 = x_(k+1)p 
+		
+		add(6,temp2,xP,temp2); 		// temp2 = (x(k+1p) + xkp)	
+		
+		mult(6,temp,6,temp2,temp2); 	// temp2 = (xkp + xp)(xk+1p + xkp)
+		square(6,xP,temp3); 		// temp3 = xp^2
+		add(6,temp2,temp3,temp2); 	// temp2 = xp^2 + (xkp + xp)(xk+1p + xkp)
+		add(6,temp2,yP,temp2); 		// temp2 = yp + xp^2 + (xkp + xp)(xk+1p + xkp)
 	
-	// Calculate (yQ+yP)*(xQ+xP)^-1
-	add(l,yQ,yP,temp);  // not needed anymore after this => throw it away
-	add(l,xQ,cxP,temp3); // Contains xP + xQ => keep for later use
-	multInv(l,temp3,l,f,temp2); 	// Contains (xP + xQ)^-1
-	mult(l,temp,l,temp2,temp); 	// Contains result of (yQ+yP)*(xQ+xP)^-1 
+		mult(6,temp,6,temp2,temp);	// temp = temp2 * (xkp + xp)
+		multInv(6,xP,6,F,temp2);	// temp2 = xP^-1
+		mult(6,temp,6,temp2,temp);
 
-	// Calculate (yQ+yP)*(xQ+xP)^-1 + xP + xQ + a
-	//add(l,temp,xP,xR); 		// At this point xP MAY BE(!) overwritten if addP was called with (xP,yP) = (xR,yR)
-	//add(l,xR,cxQ,xR);
-	add(l,temp,temp3,xR);	
-	add(l,xR,a,xR);
-
-	// Caclculate final xR
-	square(l, temp, temp2); //mult(l,temp,l,temp,temp2); 	// temp2 = ((yQ+yP)*(xQ+xP)^-1)^2 TODO Binäre quadrierung von Polynomen für speedup
-	add(l,xR,temp2,xR);	
-	
-	// Calculate yR
-	////////////////
-	
-	// !temp still contains (yQ+yP)*(xQ+xP)^-1!
-	
-	// Calculate temp * (xP + xR)
-	add(l,cxP,xR,temp2);
-	mult(l,temp,l,temp2,temp);
-
-	// Calculate yR = temp + xR + yP
-	add(l,temp,xR,temp);
-	add(l,temp,yP,yR);
-
-	//free(temp);
-	//free(temp2);
-	//free(temp3);
-	//free(cxP);
-	//free(cyP);
-}
-
-/*
- * FUNCTION
- *   dbl
- *
- * INPUT
- *   + length of vectors 
- *   + irreducible polynom F to generate the finite field
- *   + elliptic curve parameter b
- *   + x-coordinate xP of point P
- *   + y-coordinate yP of point P
- *
- * OUTPUT
- *   + x-coordinate xR of point R
- *   + y-coordinate yR of point R
- *
- * RETURN
- *   -
- *
- * DESCRIPTION/REMARKS
- *   The function calculates the point R = 2P
- */
-void dbl(uint32_t l, uint32_t *f, uint32_t *b, uint32_t *xP, uint32_t *yP, uint32_t *xR, uint32_t *yR){
-	// Is Q neutral element?
-	if(isNeutral(l,xP,yP))
-		return;	// Assumes that dbl call has (xP,yP) = (xR,yR)!!!
-
-	// Create copy of xP and yP to make sure (xP,yP) may be (xR,yR)
-	uint32_t *cxP = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));
-	memcpy (cxP, xP, (sizeof(uint32_t) * (l))); // Copy of xP
-	//uint32_t *cyP = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));
-	//memcpy (cyP, yP, (sizeof(uint32_t) * (l))); // Copy of yP
-
-
-	//uint32_t *temp = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));		
-	//uint32_t *temp2 = (uint32_t *) malloc(sizeof(uint32_t)*(l+1));
-	
-	// Check if P == -P => R is infinite element TODO UNSER IF CORRECT
-	add(l,xP,yP,temp);
-	int i;
-	if(f2m_is_equal(l,yP,temp)){
-		// Return neutral element
-		for(i = 0; i < l; i++){
-			xR[i] = INFINITELEMENT;
-			yR[i] = INFINITELEMENT;
-		}
-		return;
+		add(6,temp,yP,yQ);
 	}
-
-	// Calclulate xR
-	////////////////
-	square(l, xP, temp); //mult(l,xP,l,xP,temp); // temp = xp^2 // TODO Polynomquadrierung 
-	multInv(l,temp,l,f,xR); // xR = temp^-1 = x^2^-1
-	mult(l,xR,l,b,xR); // xR = b * xP^2^-1
-	add(l,xR,temp,xR); // xR = xR + xP^2
-
-	// Calclulate yR
-	////////////////
-	add(l,temp,xR,temp); // temp = xp^2 + xR
-	multInv(l,cxP,l,f,temp2); // temp2 = xP^-1
-	mult(l,temp2,l,yP,yR); // yR = yP * xP^-1
-	add(l,yR,cxP,yR); // => yR = (xP + yP * xP^-1)
-	mult(l,yR,l,xR,yR); // yR = (xP + yP * xP^-1) * xR
-	add(l,yR,temp,yR); // yR = (xP + yP * xP^-1) * xR + xp^2 + xR
-	
-	//free(temp);
-	//free(temp2);
-	free(cxP);
-}
-
-// TODO Point doubleing on projective coordinates for Montgomery
-void pdbl(uint32_t *b, uint32_t *XP, uint32_t *ZP, uint32_t *XS, uint32_t *ZS){
-
-}
-
-// TODO Point adding on projective coordinates for Montgomery
-void padd(uint32_t *xD, uint32_t *XP, uint32_t *ZP, uint32_t *XQ, uint32_t *ZQ, uint32_t *XR, uint32_t *ZR){
-
 }
 
 /*
@@ -351,43 +286,10 @@ void padd(uint32_t *xD, uint32_t *XP, uint32_t *ZP, uint32_t *XQ, uint32_t *ZQ, 
  * DESCRIPTION/REMARKS
  *   The function calculates the point Q = dP
  */
-/*void mult_scalar(
-  uint32_t m,
-  uint32_t *F,
-  uint32_t *a,
-  uint32_t *b,
-  uint32_t *d,
-  uint32_t *xP,
-  uint32_t *yP,
-  uint32_t *xQ,
-  uint32_t *yQ  
-)
-{
-	// Initialize
-	int i;	
-	
-
-	// Q = neutral element
-	for(i = 0; i < 6; i++){
-		xQ[i] = INFINITELEMENT;
-		yQ[i] = INFINITELEMENT;
-	}
-	
-	// Implements the double and add method
-	for(i = deg(6,d); i >= 0; i--){
-		// Double
-		dbl(6, F, b, xQ, yQ, xQ, yQ);
-		//dbls++; // TODO DEBUG REMOVE
-		if((d[i/32]>>(i%32))&0x1){ // (d[i/32] &(0x1 << (i%32)))
-			// Add
-			addP(6, F, a, xQ, yQ, xP, yP, xQ, yQ);
-			//adds++; // TODO DEBUG REMOVE
-		} 
-	}
-
-	//printf("Dbl Operations: %d \t Add Operations: %d \n", dbls, adds); // TODO REMOVE DEBUG 
-}*/
- 
+uint32_t X_Q[6];
+uint32_t Z_Q[6];
+uint32_t X_R[6];
+uint32_t Z_R[6];
 
 void mult_scalar(
   uint32_t m,
@@ -402,25 +304,45 @@ void mult_scalar(
 )
 {
 	// Initialize
-	int i;
- 
-	// Q = neutral element
+	int i;	
+	int z = 1;
+	
 	for(i = 0; i < 6; i++){
-		xQ[i] = INFINITELEMENT;
-		yQ[i] = INFINITELEMENT;
+		X_Q[i] = 0;
+		Z_Q[i] = 0;
+		X_R[i] = xP[i];
+		Z_R[i] = 0;
 	}
 
-	// Implements the double and add method
+	X_Q[0] = 1;
+	Z_R[0] = 1;
+	
+
+	// Check if d is 0, return infinite element then
+	for(i = 0; i < 6; i++){
+		if(d[i] != 0x00000000){
+			z = 0;	
+		}
+		xQ[i] = 0xFFFFFFFF;
+		yQ[i] = 0xFFFFFFFF;
+	}
+
+	// Return if d was 0
+	if(z) return;
+	
+	// Implements montgomery point multiplication
 	for(i = deg(6,d); i >= 0; i--){
-		// Double
-		dbl(6, F, b, xQ, yQ, xQ, yQ);
 		if((d[i/32]>>(i%32))&0x1){ // (d[i/32] &(0x1 << (i%32)))
-			// Add
-			addP(6, F, a, xQ, yQ, xP, yP, xQ, yQ);
-		} 
+			padd(xP, X_Q, Z_Q, X_R, Z_R, X_Q, Z_Q);			
+			pdbl(b, X_R, Z_R, X_R, Z_R);			
+		} else {
+			padd(xP, X_R, Z_R, X_Q, Z_Q, X_R, Z_R);			
+			pdbl(b, X_Q, Z_Q, X_Q, Z_Q);	
+		}
 	}
 
-	//printf("Dbl Operations: %d \t Add Operations: %d \n", dbls, adds); // TODO REMOVE DEBUG 
+	// Calculate final result
+	convert(xP, yP, F, X_Q, Z_Q, X_R, Z_R, xQ, yQ);
 }
 
 /* 
@@ -482,8 +404,8 @@ uint32_t test_ecc_b163()
            0x71A0094F, 0xD51FBC6C, 0x00000000}, /* y-coord. of base point */
 						 
   n[6] = {0xA4234C33, 0x77E70C12, 0x000292FE, 
-          0x00000000, 0x00000000, 0x00000004}; /* order of base point */
-	
+          0x00000000, 0x00000000, 0x00000004}; /* order of base point */ 
+		
   printf("\n************************************************************\n");
   printf("test: scalar multiplication of EC over GF(2^163)\n");
   printf("\nirreducible polynomial to generate GF(2^163)\n");
@@ -638,7 +560,7 @@ void scalarMultTest(){
     	printf("************************************************************\n");
     	printf("Test 2: \nk = 5\n");
 	printf("xF = "); f2m_print(6,xF);printf("\n");	
-	printf("yF = "); f2m_print(6,yQ);printf("\n");    	
+	printf("yF = "); f2m_print(6,yF);printf("\n");    	
 	printf("************************************************************\n");
 
 	mult_scalar(163,f,a,b,dF,xP,yP,xQ,yQ);
@@ -765,7 +687,7 @@ void scalarMultTest(){
 int main(void)
 {
   	createTable();
-	//scalarMultTest();
+	scalarMultTest();
 	srand(1);
   	printf("\ntest_ecc_b163: %d\n",test_ecc_b163());
   	return 0;

@@ -1,6 +1,10 @@
 /*
-	Implements the efficient squaring of polynomials
-*/
+ * Implements the efficient squaring of polynomials
+ *
+ * TEAM
+ * Letzkus, Fabian, 1480247 (TU Darmstadt)
+ * Springer, Markus, 1401899 (TU Darmstadt) 
+ */
 #include <math.h>
 
 uint32_t table[(1 << 16)]; // Table that contains the precomputed partitions
@@ -19,8 +23,6 @@ void square(uint32_t l, uint32_t *a, uint32_t *r){
 		qTemp[j++] = table[((a[i] & 0xFFFF0000)>>16)];// Upper half	
 	} 
 
-	//upper = temp+2;
-	//mod_f163(upper);
 	mod_f163(qTemp);
 
 	memcpy(r, qTemp, (sizeof(uint32_t) * l));
@@ -40,8 +42,4 @@ void createTable(){
 			table[resultptr++] = pow(2,i*2) + table[j];
 		
 	}
-
-	// TODO DEBUG
-	/*for(i = 0; i < (1 << 16); i++)
-		printf("%d \n",table[i]);*/
 }

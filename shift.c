@@ -1,5 +1,9 @@
 /*
  * Implementation of shift operations
+ *
+ * TEAM
+ * Letzkus, Fabian, 1480247 (TU Darmstadt)
+ * Springer, Markus, 1401899 (TU Darmstadt)
  */
 
 #include <stdio.h>
@@ -63,6 +67,24 @@ void shiftr(uint32_t la, uint32_t *a, uint32_t k, uint32_t *b) {
 	}
 }
 
+/*
+ * FUNCTION
+ *  shiftBr
+ *
+ * INPUT
+ *   length l of vector a
+ *   vector a
+ *
+ * OUTPUT
+ *   a >> 1
+ * 
+ * RETURN
+ *   -
+ * 
+ * DESCRIPTION/REMARKS
+ *   Shifts vector a 1 digit to the right 
+ * 
+ */
 void shiftBr(uint32_t l, uint32_t *a){
 	int i;
 	uint32_t lsb;
@@ -108,8 +130,6 @@ void shiftBr(uint32_t l, uint32_t *a){
  *
  */
 void shiftl(uint32_t la, uint32_t *a, uint32_t k, uint32_t lb, uint32_t *b) {
-	// TODO is overflow handling needed?
-	// important for R2L_mult
 	// b = a << k mod f for a = a[t-1]...a[0]	 
 	uint32_t ws;	// Word internal shift value
 	uint32_t i;	// loopctr
@@ -137,11 +157,26 @@ void shiftl(uint32_t la, uint32_t *a, uint32_t k, uint32_t lb, uint32_t *b) {
 			oflow = (cpy >> (32-ws));
 		}	
 	}
-
-	//free wcpy;	// Free allocation of working copy
 }
 
-
+/*
+ * FUNCTION
+ *  shiftBl
+ *
+ * INPUT
+ *   length l of vector a
+ *   vector a
+ *
+ * OUTPUT
+ *   a << 1
+ * 
+ * RETURN
+ *   -
+ * 
+ * DESCRIPTION/REMARKS
+ *   Shifts vector a 1 digit to the left 
+ * 
+ */
 void shiftBl(uint32_t l, uint32_t *a){
 	int i;
 	uint32_t msb;

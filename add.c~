@@ -1,5 +1,9 @@
 /*
  * Implementation of add operations
+ *
+ * TEAM
+ * Letzkus, Fabian, 1480247 (TU Darmstadt)
+ * Springer, Markus, 1401899 (TU Darmstadt) 
  */
 
 #include <stdint.h>
@@ -36,13 +40,6 @@
 void add(uint32_t t, uint32_t *a, uint32_t *b, uint32_t *c) {
 	int i;
 	for(i=0;i<t;i++) {
-		c[i] = a[i] ^ b[i];
-	}
-}
-
-void addI(uint32_t s_a, uint32_t *a, uint32_t s_b, uint32_t *b, uint32_t *c) {
-	int i;
-	for(i=0;(i< s_a && i < s_b);i++) {
 		c[i] = a[i] ^ b[i];
 	}
 }
